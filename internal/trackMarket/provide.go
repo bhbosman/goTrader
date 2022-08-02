@@ -13,7 +13,8 @@ import (
 	"go.uber.org/zap"
 )
 
-type OnITrackMarketServiceCreate func() (ITrackMarketService, error)
+type OnITrackMarketServiceCreate func(modelSettings modelSettings) (ITrackMarketService, error)
+type OnITrackMarketDataCreate func(modelSettings modelSettings) (ITrackMarketData, error)
 
 func Provide() fx.Option {
 	return fx.Options(
@@ -44,7 +45,7 @@ func Provide() fx.Option {
 						FmdService             fullMarketDataManagerService.IFmdManagerService
 					},
 				) (OnITrackMarketServiceCreate, error) {
-					return func() (ITrackMarketService, error) {
+					return func(modelSettings modelSettings) (ITrackMarketService, error) {
 						serviceInstance, err := newService(
 							params.ApplicationContext,
 							params.OnData,
@@ -53,7 +54,7 @@ func Provide() fx.Option {
 							params.GoFunctionCounter,
 							params.FullMarketDataHelper,
 							params.FmdService,
-							modelSettings{},
+							modelSettings,
 						)
 						if err != nil {
 							return nil, err
@@ -77,7 +78,10 @@ func Provide() fx.Option {
 						OnStart: func(ctx context.Context) error {
 							return params.FxManagerService.Add("1111",
 								func() (messages.IApp, context.CancelFunc, error) {
-									trackMarketService, err := params.OnITrackMarketServiceCreate()
+									modelSettingsInstance := modelSettings{
+										instrument: []string{"Luno.XBTZAR", "Kraken.XBT/USD"},
+									}
+									trackMarketService, err := params.OnITrackMarketServiceCreate(modelSettingsInstance)
 									if err != nil {
 										return nil, nil, err
 									}

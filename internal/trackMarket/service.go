@@ -23,7 +23,7 @@ type service struct {
 	state                IFxService.State
 	pubSub               *pubsub.PubSub
 	goFunctionCounter    GoFunctionCounter.IService
-	subscribeChannel     *pubsub.ChannelSubscription
+	subscribeChannel     *pubsub.NextFuncSubscription
 	FullMarketDataHelper fullMarketDataHelper.IFullMarketDataHelper
 	FmdService           fullMarketDataManagerService.IFmdManagerService
 	modelSettings        modelSettings
@@ -54,7 +54,7 @@ func (self *service) OnStart(ctx context.Context) error {
 }
 
 func (self *service) OnStop(ctx context.Context) error {
-	self.FmdService.UnsubscribeFullMarketData(self.modelSettings.instrument)
+	self.FmdService.UnsubscribeFullMarketDataMulti(self.modelSettings.instrument...)
 	err := self.shutdown(ctx)
 	close(self.cmdChannel)
 	self.state = IFxService.Stopped
@@ -73,7 +73,7 @@ func (self *service) start(_ context.Context) error {
 	}
 
 	return self.goFunctionCounter.GoRun(
-		"FMD Service",
+		"Market Tracker",
 		func() {
 			self.goStart(instanceData)
 		},
@@ -81,9 +81,11 @@ func (self *service) start(_ context.Context) error {
 }
 
 func (self *service) goStart(instanceData ITrackMarketData) {
-	self.subscribeChannel = pubsub.NewChannelSubscription(32)
-	self.pubSub.AddSub(self.subscribeChannel, self.FullMarketDataHelper.InstrumentChannelName(self.modelSettings.instrument))
-	self.FmdService.SubscribeFullMarketData(self.modelSettings.instrument)
+	self.subscribeChannel = pubsub.NewNextFuncSubscription(goCommsDefinitions.CreateNextFunc(self.cmdChannel))
+	self.pubSub.AddSub(
+		self.subscribeChannel,
+		self.FullMarketDataHelper.InstrumentChannelNameMulti(self.modelSettings.instrument...)...)
+	self.FmdService.SubscribeFullMarketDataMulti(self.modelSettings.instrument...)
 
 	channelHandlerCallback := ChannelHandler.CreateChannelHandlerCallback(
 		self.ctx,
@@ -125,14 +127,6 @@ loop:
 			}
 			break loop
 		case event, ok := <-self.cmdChannel:
-			if !ok {
-				return
-			}
-			breakLoop, err := channelHandlerCallback(event)
-			if err != nil || breakLoop {
-				break loop
-			}
-		case event, ok := <-self.subscribeChannel.Data:
 			if !ok {
 				return
 			}

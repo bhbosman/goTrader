@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b08e19cb-61dc-4433-b044-2968b5c50015" name="Changes" comment="refactor" />
+    <list default="true" id="b08e19cb-61dc-4433-b044-2968b5c50015" name="Changes" comment="refactor">
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -146,11 +148,6 @@
           <url>file://$PROJECT_DIR$/internal/trackMarket/data.go</url>
           <line>27</line>
           <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/../goCommonMarketData/fullMarketDataManagerService/data.go</url>
-          <line>141</line>
-          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

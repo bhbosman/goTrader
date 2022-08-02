@@ -1,7 +1,6 @@
-package lunoService
+package trackMarketView
 
 import (
-	"context"
 	"github.com/bhbosman/goCommsDefinitions"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
@@ -10,6 +9,7 @@ import (
 	"github.com/bhbosman/gocommon/services/ISendMessage"
 	"github.com/cskr/pubsub"
 	"go.uber.org/zap"
+	"golang.org/x/net/context"
 )
 
 type service struct {
@@ -17,7 +17,7 @@ type service struct {
 	ctx               context.Context
 	cancelFunc        context.CancelFunc
 	cmdChannel        chan interface{}
-	onData            func() (ILunoServiceData, error)
+	onData            func() (ITrackMarketViewData, error)
 	Logger            *zap.Logger
 	state             IFxService.State
 	pubSub            *pubsub.PubSub
@@ -26,14 +26,14 @@ type service struct {
 }
 
 func (self *service) MultiSend(messages ...interface{}) {
-	_, err := CallILunoServiceMultiSend(self.ctx, self.cmdChannel, false, messages...)
+	_, err := CallITrackMarketViewMultiSend(self.ctx, self.cmdChannel, false, messages...)
 	if err != nil {
 		return
 	}
 }
 
 func (self *service) Send(message interface{}) error {
-	send, err := CallILunoServiceSend(self.ctx, self.cmdChannel, false, message)
+	send, err := CallITrackMarketViewSend(self.ctx, self.cmdChannel, false, message)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (self *service) start(_ context.Context) error {
 	)
 }
 
-func (self *service) goStart(instanceData ILunoServiceData) {
+func (self *service) goStart(instanceData ITrackMarketViewData) {
 	self.subscribeChannel = pubsub.NewNextFuncSubscription(goCommsDefinitions.CreateNextFunc(self.cmdChannel))
 
 	channelHandlerCallback := ChannelHandler.CreateChannelHandlerCallback(
@@ -84,8 +84,8 @@ func (self *service) goStart(instanceData ILunoServiceData) {
 		[]ChannelHandler.ChannelHandler{
 			{
 				Cb: func(next interface{}, message interface{}) (bool, error) {
-					if unk, ok := next.(ILunoService); ok {
-						return ChannelEventsForILunoService(unk, message)
+					if unk, ok := next.(ITrackMarketView); ok {
+						return ChannelEventsForITrackMarketView(unk, message)
 					}
 					return false, nil
 
@@ -106,8 +106,6 @@ func (self *service) goStart(instanceData ILunoServiceData) {
 		},
 		goCommsDefinitions.CreateTryNextFunc(self.cmdChannel),
 	)
-
-	instanceData.Start()
 loop:
 	for {
 		select {
@@ -136,16 +134,16 @@ func (self *service) State() IFxService.State {
 }
 
 func (self service) ServiceName() string {
-	return "LunoService"
+	return "TrackMarketView"
 }
 
 func newService(
 	parentContext context.Context,
-	onData func() (ILunoServiceData, error),
+	onData func() (ITrackMarketViewData, error),
 	logger *zap.Logger,
 	pubSub *pubsub.PubSub,
 	goFunctionCounter GoFunctionCounter.IService,
-) (ILunoServiceService, error) {
+) (ITrackMarketViewService, error) {
 	localCtx, localCancelFunc := context.WithCancel(parentContext)
 	return &service{
 		parentContext:     parentContext,

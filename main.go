@@ -9,6 +9,7 @@ import (
 	"github.com/bhbosman/goTrader/internal/lunoService"
 	"github.com/bhbosman/goTrader/internal/marketDataConnection"
 	"github.com/bhbosman/goTrader/internal/trackMarket"
+	"github.com/bhbosman/goTrader/internal/trackMarketView"
 )
 
 func main() {
@@ -23,6 +24,8 @@ func main() {
 		instrumentReference.Provide(),
 		//lunoService.Provide(),
 		trackMarket.Provide(),
+		trackMarketView.Provide(),
+		trackMarketView.ProvideView(),
 		lunoService.ProvideLunoKeys(
 			false,
 			&lunoService.LunoKeys{
