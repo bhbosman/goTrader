@@ -7,6 +7,7 @@ import (
 	"go.uber.org/fx"
 )
 
+// ISlideService this must be replaced with the actual service
 type ISlideService interface {
 	SetData(change interface{})
 }
@@ -183,7 +184,7 @@ func (self *factory) Content(nextSlide func()) (string, ui2.IPrimitiveCloser, er
 }
 
 func (self *factory) Title() string {
-	return "sssssssssMarketData"
+	return "(some view name)"
 }
 
 func NewCoverSlideFactory(
@@ -196,6 +197,7 @@ func NewCoverSlideFactory(
 	}
 }
 
+// this must be replaced with the actual service
 type slideService struct {
 }
 
