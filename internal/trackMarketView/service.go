@@ -23,6 +23,11 @@ type service struct {
 	pubSub            *pubsub.PubSub
 	goFunctionCounter GoFunctionCounter.IService
 	subscribeChannel  *pubsub.NextFuncSubscription
+	onListChange      func(data []string) bool
+}
+
+func (self *service) SetListChange(onListChange func(data []string) bool) {
+	self.onListChange = onListChange
 }
 
 func (self *service) MultiSend(messages ...interface{}) {
@@ -76,6 +81,8 @@ func (self *service) start(_ context.Context) error {
 }
 
 func (self *service) goStart(instanceData ITrackMarketViewData) {
+	instanceData.SetListChange(self.onListChange)
+
 	self.subscribeChannel = pubsub.NewNextFuncSubscription(goCommsDefinitions.CreateNextFunc(self.cmdChannel))
 
 	channelHandlerCallback := ChannelHandler.CreateChannelHandlerCallback(

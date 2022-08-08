@@ -1,5 +1,6 @@
 package trackMarket
 
 type modelSettings struct {
-	instrument []string
+	Name       string
+	instrument string
 }

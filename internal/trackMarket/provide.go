@@ -5,6 +5,7 @@ import (
 	"github.com/bhbosman/goCommonMarketData/fullMarketDataHelper"
 	"github.com/bhbosman/goCommonMarketData/fullMarketDataManagerService"
 	fxAppManager "github.com/bhbosman/goFxAppManager/service"
+	"github.com/bhbosman/goTrader/internal/trackMarketView"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/interfaces"
 	"github.com/bhbosman/gocommon/messages"
@@ -22,10 +23,11 @@ func Provide() fx.Option {
 			func(
 				params struct {
 					fx.In
+					TrackMarketViewService trackMarketView.ITrackMarketViewService
 				},
 			) (OnITrackMarketDataCreate, error) {
 				return func(modelSettings modelSettings) (ITrackMarketData, error) {
-					return newData(modelSettings)
+					return newData(params.TrackMarketViewService, modelSettings)
 				}, nil
 			},
 		),
@@ -73,25 +75,40 @@ func Provide() fx.Option {
 					FxManagerService            fxAppManager.IFxManagerService
 				},
 			) error {
-				params.Lifecycle.Append(
-					fx.Hook{
-						OnStart: func(ctx context.Context) error {
-							return params.FxManagerService.Add("1111",
-								func() (messages.IApp, context.CancelFunc, error) {
-									modelSettingsInstance := modelSettings{
-										instrument: []string{"Luno.XBTZAR", "Kraken.XBT/USD"},
-									}
-									trackMarketService, err := params.OnITrackMarketServiceCreate(modelSettingsInstance)
-									if err != nil {
-										return nil, nil, err
-									}
-									app := newAppWrapper(trackMarketService)
-									return app, func() {}, nil
-								},
-							)
+				models := []modelSettings{
+					{
+						Name:       "Luno.XBTZAR 01",
+						instrument: "Luno.XBTZAR",
+					},
+					{
+						Name:       "Luno.XBTZAR 02",
+						instrument: "Luno.XBTZAR",
+					},
+					{
+						Name:       "Luno.XBTZAR 03",
+						instrument: "Luno.XBTZAR",
+					},
+				}
+				for _, m := range models {
+					localModel := m
+					params.Lifecycle.Append(
+						fx.Hook{
+							OnStart: func(ctx context.Context) error {
+								return params.FxManagerService.Add(localModel.Name,
+									func() (messages.IApp, context.CancelFunc, error) {
+										trackMarketService, err := params.OnITrackMarketServiceCreate(localModel)
+										if err != nil {
+											return nil, nil, err
+										}
+										app := newAppWrapper(trackMarketService)
+										return app, func() {}, nil
+									},
+								)
+							},
+							OnStop: nil,
 						},
-						OnStop: nil,
-					})
+					)
+				}
 				return nil
 			},
 		),

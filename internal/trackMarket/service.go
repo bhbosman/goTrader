@@ -54,7 +54,7 @@ func (self *service) OnStart(ctx context.Context) error {
 }
 
 func (self *service) OnStop(ctx context.Context) error {
-	self.FmdService.UnsubscribeFullMarketDataMulti(self.modelSettings.instrument...)
+	self.FmdService.UnsubscribeFullMarketData(self.modelSettings.instrument)
 	err := self.shutdown(ctx)
 	close(self.cmdChannel)
 	self.state = IFxService.Stopped
@@ -84,8 +84,8 @@ func (self *service) goStart(instanceData ITrackMarketData) {
 	self.subscribeChannel = pubsub.NewNextFuncSubscription(goCommsDefinitions.CreateNextFunc(self.cmdChannel))
 	self.pubSub.AddSub(
 		self.subscribeChannel,
-		self.FullMarketDataHelper.InstrumentChannelNameMulti(self.modelSettings.instrument...)...)
-	self.FmdService.SubscribeFullMarketDataMulti(self.modelSettings.instrument...)
+		self.FullMarketDataHelper.InstrumentChannelNameForTop5(self.modelSettings.instrument))
+	self.FmdService.SubscribeFullMarketData(self.modelSettings.instrument)
 
 	channelHandlerCallback := ChannelHandler.CreateChannelHandlerCallback(
 		self.ctx,
@@ -142,7 +142,7 @@ func (self *service) State() IFxService.State {
 	return self.state
 }
 
-func (self service) ServiceName() string {
+func (self *service) ServiceName() string {
 	return "TrackMarket"
 }
 

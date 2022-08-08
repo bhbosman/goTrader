@@ -41,7 +41,6 @@ func ProvideMarketDataDialer(
 						FmdService           fullMarketDataManagerService.IFmdManagerService
 					},
 				) (messages.CreateAppCallback, error) {
-
 					dialerUrl, err := url.Parse(urlAsText)
 					if err != nil {
 						return messages.CreateAppCallback{}, err

@@ -2,14 +2,17 @@ package trackMarket
 
 import (
 	"github.com/bhbosman/goMessages/marketData/stream"
+	"github.com/bhbosman/goTrader/internal/trackMarketView"
+	"github.com/bhbosman/goTrader/publish"
 	"github.com/bhbosman/gocommon/messageRouter"
 	"github.com/bhbosman/gocommon/messages"
 )
 
 type data struct {
-	MessageRouter *messageRouter.MessageRouter
-	activeDataMap map[string]*stream.PublishTop5
-	modelSettings modelSettings
+	MessageRouter          *messageRouter.MessageRouter
+	activeDataMap          map[string]*stream.PublishTop5
+	modelSettings          modelSettings
+	TrackMarketViewService trackMarketView.ITrackMarketViewService
 }
 
 func (self *data) MultiSend(messages ...interface{}) {
@@ -30,13 +33,37 @@ func (self *data) handlePublishTop5(msg *stream.PublishTop5) {
 }
 
 func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) {
+	if top5, ok := self.activeDataMap[self.modelSettings.instrument]; ok {
+		maxIndex := func(a int, b []*stream.Point) int {
+			if len(b) < a {
+				return len(b)
+			}
+			return a
+		}
+		publishData := &publish.PublishData{
+			StrategyName: self.modelSettings.Name,
+		}
+		for i := 0; i < maxIndex(5, top5.Ask); i++ {
+			publishData.Lines[i].Ask.Price = top5.Ask[i].Price
+			publishData.Lines[i].Ask.Volume = top5.Ask[i].Volume
+		}
+		for i := 0; i < maxIndex(5, top5.Bid); i++ {
+			publishData.Lines[i].Bid.Price = top5.Bid[i].Price
+			publishData.Lines[i].Bid.Volume = top5.Bid[i].Volume
+		}
+		_ = self.TrackMarketViewService.Send(publishData)
+	}
 }
 
-func newData(modelSettings modelSettings) (ITrackMarketData, error) {
+func newData(
+	trackMarketViewService trackMarketView.ITrackMarketViewService,
+	modelSettings modelSettings,
+) (ITrackMarketData, error) {
 	result := &data{
-		MessageRouter: messageRouter.NewMessageRouter(),
-		modelSettings: modelSettings,
-		activeDataMap: make(map[string]*stream.PublishTop5),
+		MessageRouter:          messageRouter.NewMessageRouter(),
+		activeDataMap:          make(map[string]*stream.PublishTop5),
+		modelSettings:          modelSettings,
+		TrackMarketViewService: trackMarketViewService,
 	}
 	result.MessageRouter.Add(result.handleEmptyQueue)
 	result.MessageRouter.Add(result.handlePublishTop5)

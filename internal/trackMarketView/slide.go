@@ -7,18 +7,15 @@ import (
 	"go.uber.org/fx"
 )
 
-// ISlideService this must be replaced with the actual service
-type ISlideService interface {
-	SetData(change interface{})
-}
-
 type slide struct {
-	next         tview.Primitive
-	canDraw      bool
-	app          *tview.Application
-	table        *tview.Table
-	listTable    *tview.Table
-	slideService ISlideService
+	next            tview.Primitive
+	canDraw         bool
+	app             *tview.Application
+	table           *tview.Table
+	listTable       *tview.Table
+	slideService    ITrackMarketViewService
+	MainFlex        *tview.Flex
+	CustomComponent tview.Primitive
 }
 
 func (self *slide) Toggle(b bool) {
@@ -96,13 +93,16 @@ func (self *slide) init() {
 
 		},
 	)
+	//self.CustomComponent = self.table
+	self.MainFlex = tview.NewFlex().
+		SetDirection(tview.FlexColumn).
+		AddItem(self.listTable, 30, 1, true).
+		AddItem(self.CustomComponent, 0, 3, false)
+
 	self.listTable.SetContent(&emptyCell{})
 	flex := tview.NewFlex().
 		AddItem(
-			tview.NewFlex().
-				SetDirection(tview.FlexColumn).
-				AddItem(self.listTable, 30, 1, true).
-				AddItem(self.table, 0, 3, false),
+			self.MainFlex,
 			0,
 			1,
 			true)
@@ -110,7 +110,7 @@ func (self *slide) init() {
 	self.next = flex
 }
 
-func (self *slide) OnSetData(data interface{}) bool {
+func (self *slide) onListChange(data []string) bool {
 	return self.app.QueueUpdate(
 		func() {
 		},
@@ -119,14 +119,14 @@ func (self *slide) OnSetData(data interface{}) bool {
 
 func newSlide(
 	app *tview.Application,
-	slideService ISlideService,
+	slideService ITrackMarketViewService,
 ) (*slide, error) {
 	result := &slide{
 		app:          app,
 		slideService: slideService,
 	}
 	result.init()
-	slideService.SetData(result.OnSetData)
+	slideService.SetListChange(result.onListChange)
 	return result, nil
 }
 
@@ -164,7 +164,7 @@ func (self *emptyCell) Clear() {
 }
 
 type factory struct {
-	Service ISlideService
+	Service ITrackMarketViewService
 	app     *tview.Application
 }
 
@@ -188,7 +188,7 @@ func (self *factory) Title() string {
 }
 
 func NewCoverSlideFactory(
-	Service ISlideService,
+	Service ITrackMarketViewService,
 	app *tview.Application,
 ) *factory {
 	return &factory{
@@ -197,31 +197,15 @@ func NewCoverSlideFactory(
 	}
 }
 
-// this must be replaced with the actual service
-type slideService struct {
-}
-
-func (self *slideService) SetData(change interface{}) {
-}
-
 func ProvideView() fx.Option {
 	return fx.Options(
-		fx.Provide(
-			fx.Annotated{
-				Name:  "",
-				Group: "",
-				Target: func() (ISlideService, error) {
-					return &slideService{}, nil
-				},
-			},
-		),
 		fx.Provide(
 			fx.Annotated{
 				Group: "RegisteredMainWindowSlides",
 				Target: func(
 					params struct {
 						fx.In
-						Service ISlideService
+						Service ITrackMarketViewService
 						App     *tview.Application
 					},
 				) (ui2.ISlideFactory, error) {

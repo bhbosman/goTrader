@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-	//var lunoServiceInstance lunoService.ILunoServiceService
 	app := goFxApp.NewFxMainApplicationServices(
 		"Trader",
 		false,
@@ -22,7 +21,6 @@ func main() {
 		fullMarketDataManagerService.Provide(true),
 		fullMarketDataHelper.Provide(),
 		instrumentReference.Provide(),
-		//lunoService.Provide(),
 		trackMarket.Provide(),
 		trackMarketView.Provide(),
 		trackMarketView.ProvideView(),

@@ -11,12 +11,18 @@ type ITrackMarketView interface {
 	ISendMessage.IMultiSendMessage
 }
 
+type IUi interface {
+	SetListChange(onListChange func(data []string) bool)
+}
+
 type ITrackMarketViewService interface {
 	ITrackMarketView
 	IFxService.IFxServices
+	IUi
 }
 
 type ITrackMarketViewData interface {
 	ITrackMarketView
 	IDataShutDown.IDataShutDown
+	IUi
 }
