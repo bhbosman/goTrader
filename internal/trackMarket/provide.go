@@ -5,17 +5,19 @@ import (
 	"github.com/bhbosman/goCommonMarketData/fullMarketDataHelper"
 	"github.com/bhbosman/goCommonMarketData/fullMarketDataManagerService"
 	fxAppManager "github.com/bhbosman/goFxAppManager/service"
+	"github.com/bhbosman/goTrader/internal/lunoService"
 	"github.com/bhbosman/goTrader/internal/trackMarketView"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/interfaces"
 	"github.com/bhbosman/gocommon/messages"
 	"github.com/cskr/pubsub"
+	"github.com/openlyinc/pointy"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
 
-type OnITrackMarketServiceCreate func(modelSettings modelSettings) (ITrackMarketService, error)
-type OnITrackMarketDataCreate func(modelSettings modelSettings) (ITrackMarketData, error)
+type OnITrackMarketServiceCreate func(modelSettings IPricingVolumeCalculation) (ITrackMarketService, error)
+type OnITrackMarketDataCreate func(modelSettings IPricingVolumeCalculation) (ITrackMarketData, error)
 
 func Provide() fx.Option {
 	return fx.Options(
@@ -23,11 +25,24 @@ func Provide() fx.Option {
 			func(
 				params struct {
 					fx.In
+					ApplicationContext     context.Context `name:"Application"`
 					TrackMarketViewService trackMarketView.ITrackMarketViewService
+					FullMarketDataHelper   fullMarketDataHelper.IFullMarketDataHelper
+					FmdService             fullMarketDataManagerService.IFmdManagerService
+					PubSub                 *pubsub.PubSub `name:"Application"`
+					LunoServiceService     lunoService.ILunoServiceService
 				},
 			) (OnITrackMarketDataCreate, error) {
-				return func(modelSettings modelSettings) (ITrackMarketData, error) {
-					return newData(params.TrackMarketViewService, modelSettings)
+				return func(modelSettings IPricingVolumeCalculation) (ITrackMarketData, error) {
+					return newData(
+						params.ApplicationContext,
+						params.TrackMarketViewService,
+						modelSettings,
+						params.FmdService,
+						params.FullMarketDataHelper,
+						params.PubSub,
+						params.LunoServiceService,
+					)
 				}, nil
 			},
 		),
@@ -43,19 +58,17 @@ func Provide() fx.Option {
 						UniqueReferenceService interfaces.IUniqueReferenceService
 						UniqueSessionNumber    interfaces.IUniqueSessionNumber
 						GoFunctionCounter      GoFunctionCounter.IService
-						FullMarketDataHelper   fullMarketDataHelper.IFullMarketDataHelper
-						FmdService             fullMarketDataManagerService.IFmdManagerService
+						//FullMarketDataHelper   fullMarketDataHelper.IFullMarketDataHelper
+						//FmdService             fullMarketDataManagerService.IFmdManagerService
 					},
 				) (OnITrackMarketServiceCreate, error) {
-					return func(modelSettings modelSettings) (ITrackMarketService, error) {
+					return func(modelSettings IPricingVolumeCalculation) (ITrackMarketService, error) {
 						serviceInstance, err := newService(
 							params.ApplicationContext,
 							params.OnData,
 							params.Logger,
 							params.PubSub,
 							params.GoFunctionCounter,
-							params.FullMarketDataHelper,
-							params.FmdService,
 							modelSettings,
 						)
 						if err != nil {
@@ -75,26 +88,31 @@ func Provide() fx.Option {
 					FxManagerService            fxAppManager.IFxManagerService
 				},
 			) error {
-				models := []modelSettings{
-					{
-						Name:       "Luno.XBTZAR 01",
-						instrument: "Luno.XBTZAR",
+				Strategies := Strategies{
+					PegToPrice: []*PegToPrice{
+						{
+							strategyName:     "Peg Luno.XBTZAR BID @ 200,000",
+							instrument:       "Luno.XBTZAR",
+							Side:             "BID",
+							PegPrice:         200000,
+							Volume:           nil,
+							Consideration:    pointy.Float64(1000),
+							TradingInterface: "",
+						},
 					},
-					{
-						Name:       "Luno.XBTZAR 02",
-						instrument: "Luno.XBTZAR",
-					},
-					{
-						Name:       "Luno.XBTZAR 03",
-						instrument: "Luno.XBTZAR",
+					modelSettings: []modelSettings{
+						{
+							Name:       "Luno.XBTZAR 01",
+							instrument: "Luno.XBTZAR",
+						},
 					},
 				}
-				for _, m := range models {
+				for _, m := range Strategies.PegToPrice {
 					localModel := m
 					params.Lifecycle.Append(
 						fx.Hook{
 							OnStart: func(ctx context.Context) error {
-								return params.FxManagerService.Add(localModel.Name,
+								return params.FxManagerService.Add(localModel.strategyName,
 									func() (messages.IApp, context.CancelFunc, error) {
 										trackMarketService, err := params.OnITrackMarketServiceCreate(localModel)
 										if err != nil {

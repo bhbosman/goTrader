@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/bhbosman/goCommonMarketData/fullMarketDataHelper"
 	"github.com/bhbosman/goCommonMarketData/fullMarketDataManagerService"
-	"github.com/bhbosman/goCommonMarketData/fullMarketDataManagerViewer"
 	"github.com/bhbosman/goCommonMarketData/instrumentReference"
 	"github.com/bhbosman/goFxApp"
 	"github.com/bhbosman/goTrader/internal/lunoService"
@@ -17,7 +16,8 @@ func main() {
 		"Trader",
 		false,
 		marketDataConnection.ProvideMarketDataDialer(1, "tcp4://127.0.0.1:4001"),
-		fullMarketDataManagerViewer.Provide(),
+		//fullMarketDataManagerViewer.Provide(),
+		lunoService.Provide(),
 		fullMarketDataManagerService.Provide(true),
 		fullMarketDataHelper.Provide(),
 		instrumentReference.Provide(),
@@ -32,7 +32,6 @@ func main() {
 			}),
 		lunoService.ProvideLunoAPIKeyID(),
 		lunoService.ProvideLunoAPIKeySecret(),
-		//fx.Populate(&lunoServiceInstance),
 	)
 	if app.FxApp.Err() != nil {
 		println(app.FxApp.Err().Error())

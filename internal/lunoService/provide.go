@@ -1,14 +1,13 @@
 package lunoService
 
 import (
-	"context"
-	service2 "github.com/bhbosman/goFxAppManager/service"
 	"github.com/bhbosman/goTrader/internal/lunoApi/client"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/interfaces"
 	"github.com/cskr/pubsub"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
+	"golang.org/x/net/context"
 	"net/http"
 )
 
@@ -26,6 +25,7 @@ func Provide() fx.Option {
 				},
 			},
 		),
+
 		fx.Provide(
 			fx.Annotated{
 				Name: "Luno",
@@ -40,6 +40,7 @@ func Provide() fx.Option {
 				},
 			},
 		),
+
 		fx.Provide(
 			fx.Annotated{
 				Name: "Luno",
@@ -56,59 +57,79 @@ func Provide() fx.Option {
 
 		fx.Provide(
 			fx.Annotated{
+				Name: "Luno",
 				Target: func(
 					params struct {
 						fx.In
-						RoundTripper http.RoundTripper      `name:"Luno"`
-						RequestDoer  client.HttpRequestDoer `name:"Luno"`
+						RequestDoer client.HttpRequestDoer `name:"Luno"`
+					},
+				) (client.ClientWithResponsesInterface, error) {
+					lunoClient, err := client.NewClientWithResponses(
+						"https://api.luno.com",
+						func(c *client.Client) error {
+							c.Client = params.RequestDoer
+							return nil
+						},
+					)
+					if err != nil {
+						return nil, err
+					}
+					return lunoClient, nil
+				},
+			},
+		),
+
+		fx.Provide(
+			fx.Annotated{
+				Target: func(
+					params struct {
+						fx.In
+						ClientWithResponses client.ClientWithResponsesInterface `name:"Luno"`
 					},
 				) (func() (ILunoServiceData, error), error) {
 					return func() (ILunoServiceData, error) {
-						return newData(params.RoundTripper, params.RequestDoer)
+						return newData(
+							params.ClientWithResponses,
+							//params.RoundTripper,
+							//params.RequestDoer,
+						)
 					}, nil
 				},
 			},
 		),
-		fx.Invoke(
-			func(
-				params struct {
-					fx.In
-					PubSub                 *pubsub.PubSub  `name:"Application"`
-					ApplicationContext     context.Context `name:"Application"`
-					OnData                 func() (ILunoServiceData, error)
-					Lifecycle              fx.Lifecycle
-					Logger                 *zap.Logger
-					UniqueReferenceService interfaces.IUniqueReferenceService
-					UniqueSessionNumber    interfaces.IUniqueSessionNumber
-					GoFunctionCounter      GoFunctionCounter.IService
-					RoundTripper           http.RoundTripper `name:"Luno"`
-					FxManagerService       service2.IFxManagerService
-				},
-			) error {
-				params.Lifecycle.Append(
-					fx.Hook{
-						OnStart: func(ctx context.Context) error {
-							serviceInstance, err := newService(
-								params.ApplicationContext,
-								params.OnData,
-								params.Logger,
-								params.PubSub,
-								params.GoFunctionCounter,
-							)
-							if err != nil {
-								return nil
-							}
-							params.Lifecycle.Append(
-								fx.Hook{
-									OnStart: serviceInstance.OnStart,
-									OnStop:  serviceInstance.OnStop,
-								},
-							)
-							return nil
+		fx.Provide(
+			fx.Annotated{
+				Target: func(
+					params struct {
+						fx.In
+						PubSub                 *pubsub.PubSub  `name:"Application"`
+						ApplicationContext     context.Context `name:"Application"`
+						OnData                 func() (ILunoServiceData, error)
+						Lifecycle              fx.Lifecycle
+						Logger                 *zap.Logger
+						UniqueReferenceService interfaces.IUniqueReferenceService
+						UniqueSessionNumber    interfaces.IUniqueSessionNumber
+						GoFunctionCounter      GoFunctionCounter.IService
+					},
+				) (ILunoServiceService, error) {
+					serviceInstance, err := newService(
+						params.ApplicationContext,
+						params.OnData,
+						params.Logger,
+						params.PubSub,
+						params.GoFunctionCounter,
+					)
+					if err != nil {
+						return nil, err
+					}
+					params.Lifecycle.Append(
+						fx.Hook{
+							OnStart: serviceInstance.OnStart,
+							OnStop:  serviceInstance.OnStop,
 						},
-						OnStop: nil,
-					})
-				return nil
+					)
+					return serviceInstance, nil
+				},
 			},
 		),
 	)

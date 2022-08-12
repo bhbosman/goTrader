@@ -15,9 +15,15 @@ type PriceLine struct {
 
 type PublishData struct {
 	StrategyName string
-	Lines        [5]PriceLine
+	State        string
+
+	Lines [5]PriceLine
 }
 
 func (self *PublishData) GetStrategyName() string {
 	return self.StrategyName
+}
+
+type DeleteStrategy struct {
+	StrategyName string
 }

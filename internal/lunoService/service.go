@@ -13,7 +13,6 @@ import (
 )
 
 type service struct {
-	parentContext     context.Context
 	ctx               context.Context
 	cancelFunc        context.CancelFunc
 	cmdChannel        chan interface{}
@@ -23,6 +22,20 @@ type service struct {
 	pubSub            *pubsub.PubSub
 	goFunctionCounter GoFunctionCounter.IService
 	subscribeChannel  *pubsub.NextFuncSubscription
+}
+
+func (self *service) ListOrders(ctx context.Context, params ListOrderRequest, cb ListOrderResponseCallback) {
+	_, err := CallILunoServiceListOrders(self.ctx, self.cmdChannel, false, ctx, params, cb)
+	if err != nil {
+		return
+	}
+}
+
+func (self *service) CancelOrder(ctx context.Context, params CancelOrderRequest, cb CancelOrderRequestResponseCallback) {
+	_, err := CallILunoServiceCancelOrder(self.ctx, self.cmdChannel, false, ctx, params, cb)
+	if err != nil {
+		return
+	}
 }
 
 func (self *service) MultiSend(messages ...interface{}) {
@@ -135,7 +148,7 @@ func (self *service) State() IFxService.State {
 	return self.state
 }
 
-func (self service) ServiceName() string {
+func (self *service) ServiceName() string {
 	return "LunoService"
 }
 
@@ -148,7 +161,6 @@ func newService(
 ) (ILunoServiceService, error) {
 	localCtx, localCancelFunc := context.WithCancel(parentContext)
 	return &service{
-		parentContext:     parentContext,
 		ctx:               localCtx,
 		cancelFunc:        localCancelFunc,
 		cmdChannel:        make(chan interface{}, 32),

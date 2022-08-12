@@ -1,6 +1,7 @@
 package trackMarketView
 
 import (
+	"github.com/bhbosman/goTrader/internal/publish"
 	ui2 "github.com/bhbosman/goUi/ui"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -13,18 +14,24 @@ type slide struct {
 	app             *tview.Application
 	table           *tview.Table
 	listTable       *tview.Table
-	slideService    ITrackMarketViewService
+	service         ITrackMarketViewService
 	MainFlex        *tview.Flex
-	CustomComponent tview.Primitive
+	CustomComponent IAlgoViewer
+	listPlate       *listPlate
+	selectedItem    string
 }
 
 func (self *slide) Toggle(b bool) {
 	self.canDraw = b
 	switch b {
 	case true:
-		break
+		if self.selectedItem != "" {
+			self.service.Subscribe(self.selectedItem)
+		}
 	case false:
-		break
+		if self.selectedItem != "" {
+			self.service.Unsubscribe(self.selectedItem)
+		}
 	}
 	if b {
 		self.app.ForceDraw()
@@ -86,6 +93,23 @@ func (self *slide) init() {
 	self.listTable.SetSelectionChangedFunc(
 		func(row, column int) {
 			row, _ = self.listTable.GetSelection()
+			if self.CustomComponent != nil {
+				self.MainFlex.RemoveItem(self.CustomComponent)
+			}
+			if item, ok := self.listPlate.GetItem(row); ok {
+				self.CustomComponent = NewAlgoViewer()
+				self.MainFlex.AddItem(self.CustomComponent, 0, 3, false)
+
+				if item != self.selectedItem {
+					if self.selectedItem != "" {
+						self.service.Unsubscribe(self.selectedItem)
+					}
+					self.selectedItem = item
+					if self.canDraw {
+						self.service.Subscribe(self.selectedItem)
+					}
+				}
+			}
 		},
 	)
 	self.listTable.SetSelectedFunc(
@@ -95,9 +119,8 @@ func (self *slide) init() {
 	)
 	//self.CustomComponent = self.table
 	self.MainFlex = tview.NewFlex().
-		SetDirection(tview.FlexColumn).
-		AddItem(self.listTable, 30, 1, true).
-		AddItem(self.CustomComponent, 0, 3, false)
+		SetDirection(tview.FlexColumn)
+	self.MainFlex.AddItem(self.listTable, 30, 1, true)
 
 	self.listTable.SetContent(&emptyCell{})
 	flex := tview.NewFlex().
@@ -110,9 +133,44 @@ func (self *slide) init() {
 	self.next = flex
 }
 
-func (self *slide) onListChange(data []string) bool {
+func (self *slide) onStrategyDataChange(name string, strategy publish.IStrategy) bool {
 	return self.app.QueueUpdate(
 		func() {
+			if self.canDraw {
+				self.app.ForceDraw()
+			}
+		},
+	)
+}
+
+func (self *slide) onListChange(list []string) bool {
+	return self.app.QueueUpdate(
+		func() {
+			if list != nil {
+				plateNil := self.listPlate == nil
+				self.listPlate = newListPlate(list)
+				self.listTable.SetContent(self.listPlate)
+				if plateNil && self.listTable != nil && len(self.listPlate.data) > 0 {
+					self.listTable.Select(1, 0)
+				} else {
+					row, column := self.listTable.GetSelection()
+					self.listTable.Select(row, column)
+				}
+			} else {
+				//if self.selectedItem != "" {
+				//	self.service.UnsubscribeFullMarketData(self.selectedItem)
+				//}
+				//self.selectedItem = ""
+				//self.marketDataListPlate = nil
+				//self.listTable.SetContent(&emptyCell{})
+				//self.marketDataPlate = nil
+				//self.table.SetContent(&emptyCell{})
+
+			}
+
+			if self.canDraw {
+				self.app.ForceDraw()
+			}
 		},
 	)
 }
@@ -122,45 +180,13 @@ func newSlide(
 	slideService ITrackMarketViewService,
 ) (*slide, error) {
 	result := &slide{
-		app:          app,
-		slideService: slideService,
+		app:     app,
+		service: slideService,
 	}
 	result.init()
 	slideService.SetListChange(result.onListChange)
+	slideService.SetStrategyDataChange(result.onStrategyDataChange)
 	return result, nil
-}
-
-type emptyCell struct {
-}
-
-func (self *emptyCell) GetCell(row, column int) *tview.TableCell {
-	return tview.NewTableCell("")
-}
-
-func (self *emptyCell) GetRowCount() int {
-	return 0
-}
-
-func (self *emptyCell) GetColumnCount() int {
-	return 0
-}
-
-func (self *emptyCell) SetCell(row, column int, cell *tview.TableCell) {
-}
-
-func (self *emptyCell) RemoveRow(row int) {
-}
-
-func (self *emptyCell) RemoveColumn(column int) {
-}
-
-func (self *emptyCell) InsertRow(row int) {
-}
-
-func (self *emptyCell) InsertColumn(column int) {
-}
-
-func (self *emptyCell) Clear() {
 }
 
 type factory struct {

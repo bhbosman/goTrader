@@ -9,6 +9,7 @@ import (
 type ILunoService interface {
 	ISendMessage.ISendMessage
 	ISendMessage.IMultiSendMessage
+	IExchange
 }
 
 type ILunoServiceService interface {

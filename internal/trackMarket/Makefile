@@ -1,2 +1,2 @@
 all:
-	mockgen -package TrackMarket -generateWhat ddd -destination ITrackMarketInterfaceMethods.go . ITrackMarket
+	mockgen -package trackMarket -generateWhat ddd -destination ITrackMarketInterfaceMethods.go . ITrackMarket

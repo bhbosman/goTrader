@@ -5,7 +5,7 @@
 package lunoService
 
 import (
-	"context"
+	context "context"
 	fmt "fmt"
 
 	errors "github.com/bhbosman/gocommon/errors"
@@ -14,6 +14,194 @@ import (
 // Interface A Comment
 // Interface github.com/bhbosman/goTrader/internal/lunoService
 // Interface ILunoService
+// Interface ILunoService, Method: CancelOrder
+type ILunoServiceCancelOrderIn struct {
+	arg0 context.Context
+	arg1 CancelOrderRequest
+	arg2 CancelOrderRequestResponseCallback
+}
+
+type ILunoServiceCancelOrderOut struct {
+}
+type ILunoServiceCancelOrderError struct {
+	InterfaceName string
+	MethodName    string
+	Reason        string
+}
+
+func (self *ILunoServiceCancelOrderError) Error() string {
+	return fmt.Sprintf("error in data coming back from %v::%v. Reason: %v", self.InterfaceName, self.MethodName, self.Reason)
+}
+
+type ILunoServiceCancelOrder struct {
+	inData         ILunoServiceCancelOrderIn
+	outDataChannel chan ILunoServiceCancelOrderOut
+}
+
+func NewILunoServiceCancelOrder(waitToComplete bool, arg0 context.Context, arg1 CancelOrderRequest, arg2 CancelOrderRequestResponseCallback) *ILunoServiceCancelOrder {
+	var outDataChannel chan ILunoServiceCancelOrderOut
+	if waitToComplete {
+		outDataChannel = make(chan ILunoServiceCancelOrderOut)
+	} else {
+		outDataChannel = nil
+	}
+	return &ILunoServiceCancelOrder{
+		inData: ILunoServiceCancelOrderIn{
+			arg0: arg0,
+			arg1: arg1,
+			arg2: arg2,
+		},
+		outDataChannel: outDataChannel,
+	}
+}
+
+func (self *ILunoServiceCancelOrder) Wait(onError func(interfaceName string, methodName string, err error) error) (ILunoServiceCancelOrderOut, error) {
+	data, ok := <-self.outDataChannel
+	if !ok {
+		generatedError := &ILunoServiceCancelOrderError{
+			InterfaceName: "ILunoService",
+			MethodName:    "CancelOrder",
+			Reason:        "Channel for ILunoService::CancelOrder returned false",
+		}
+		if onError != nil {
+			err := onError("ILunoService", "CancelOrder", generatedError)
+			return ILunoServiceCancelOrderOut{}, err
+		} else {
+			return ILunoServiceCancelOrderOut{}, generatedError
+		}
+	}
+	return data, nil
+}
+
+func (self *ILunoServiceCancelOrder) Close() error {
+	close(self.outDataChannel)
+	return nil
+}
+func CallILunoServiceCancelOrder(context context.Context, channel chan<- interface{}, waitToComplete bool, arg0 context.Context, arg1 CancelOrderRequest, arg2 CancelOrderRequestResponseCallback) (ILunoServiceCancelOrderOut, error) {
+	if context != nil && context.Err() != nil {
+		return ILunoServiceCancelOrderOut{}, context.Err()
+	}
+	data := NewILunoServiceCancelOrder(waitToComplete, arg0, arg1, arg2)
+	if waitToComplete {
+		defer func(data *ILunoServiceCancelOrder) {
+			err := data.Close()
+			if err != nil {
+			}
+		}(data)
+	}
+	if context != nil && context.Err() != nil {
+		return ILunoServiceCancelOrderOut{}, context.Err()
+	}
+	channel <- data
+	var err error
+	var v ILunoServiceCancelOrderOut
+	if waitToComplete {
+		v, err = data.Wait(func(interfaceName string, methodName string, err error) error {
+			return err
+		})
+	} else {
+		err = errors.NoWaitOperationError
+	}
+	if err != nil {
+		return ILunoServiceCancelOrderOut{}, err
+	}
+	return v, nil
+}
+
+// Interface ILunoService, Method: ListOrders
+type ILunoServiceListOrdersIn struct {
+	arg0 context.Context
+	arg1 ListOrderRequest
+	arg2 ListOrderResponseCallback
+}
+
+type ILunoServiceListOrdersOut struct {
+}
+type ILunoServiceListOrdersError struct {
+	InterfaceName string
+	MethodName    string
+	Reason        string
+}
+
+func (self *ILunoServiceListOrdersError) Error() string {
+	return fmt.Sprintf("error in data coming back from %v::%v. Reason: %v", self.InterfaceName, self.MethodName, self.Reason)
+}
+
+type ILunoServiceListOrders struct {
+	inData         ILunoServiceListOrdersIn
+	outDataChannel chan ILunoServiceListOrdersOut
+}
+
+func NewILunoServiceListOrders(waitToComplete bool, arg0 context.Context, arg1 ListOrderRequest, arg2 ListOrderResponseCallback) *ILunoServiceListOrders {
+	var outDataChannel chan ILunoServiceListOrdersOut
+	if waitToComplete {
+		outDataChannel = make(chan ILunoServiceListOrdersOut)
+	} else {
+		outDataChannel = nil
+	}
+	return &ILunoServiceListOrders{
+		inData: ILunoServiceListOrdersIn{
+			arg0: arg0,
+			arg1: arg1,
+			arg2: arg2,
+		},
+		outDataChannel: outDataChannel,
+	}
+}
+
+func (self *ILunoServiceListOrders) Wait(onError func(interfaceName string, methodName string, err error) error) (ILunoServiceListOrdersOut, error) {
+	data, ok := <-self.outDataChannel
+	if !ok {
+		generatedError := &ILunoServiceListOrdersError{
+			InterfaceName: "ILunoService",
+			MethodName:    "ListOrders",
+			Reason:        "Channel for ILunoService::ListOrders returned false",
+		}
+		if onError != nil {
+			err := onError("ILunoService", "ListOrders", generatedError)
+			return ILunoServiceListOrdersOut{}, err
+		} else {
+			return ILunoServiceListOrdersOut{}, generatedError
+		}
+	}
+	return data, nil
+}
+
+func (self *ILunoServiceListOrders) Close() error {
+	close(self.outDataChannel)
+	return nil
+}
+func CallILunoServiceListOrders(context context.Context, channel chan<- interface{}, waitToComplete bool, arg0 context.Context, arg1 ListOrderRequest, arg2 ListOrderResponseCallback) (ILunoServiceListOrdersOut, error) {
+	if context != nil && context.Err() != nil {
+		return ILunoServiceListOrdersOut{}, context.Err()
+	}
+	data := NewILunoServiceListOrders(waitToComplete, arg0, arg1, arg2)
+	if waitToComplete {
+		defer func(data *ILunoServiceListOrders) {
+			err := data.Close()
+			if err != nil {
+			}
+		}(data)
+	}
+	if context != nil && context.Err() != nil {
+		return ILunoServiceListOrdersOut{}, context.Err()
+	}
+	channel <- data
+	var err error
+	var v ILunoServiceListOrdersOut
+	if waitToComplete {
+		v, err = data.Wait(func(interfaceName string, methodName string, err error) error {
+			return err
+		})
+	} else {
+		err = errors.NoWaitOperationError
+	}
+	if err != nil {
+		return ILunoServiceListOrdersOut{}, err
+	}
+	return v, nil
+}
+
 // Interface ILunoService, Method: MultiSend
 type ILunoServiceMultiSendIn struct {
 	arg0 []interface{}
@@ -197,6 +385,20 @@ func CallILunoServiceSend(context context.Context, channel chan<- interface{}, w
 
 func ChannelEventsForILunoService(next ILunoService, event interface{}) (bool, error) {
 	switch v := event.(type) {
+	case *ILunoServiceCancelOrder:
+		data := ILunoServiceCancelOrderOut{}
+		next.CancelOrder(v.inData.arg0, v.inData.arg1, v.inData.arg2)
+		if v.outDataChannel != nil {
+			v.outDataChannel <- data
+		}
+		return true, nil
+	case *ILunoServiceListOrders:
+		data := ILunoServiceListOrdersOut{}
+		next.ListOrders(v.inData.arg0, v.inData.arg1, v.inData.arg2)
+		if v.outDataChannel != nil {
+			v.outDataChannel <- data
+		}
+		return true, nil
 	case *ILunoServiceMultiSend:
 		data := ILunoServiceMultiSendOut{}
 		next.MultiSend(v.inData.arg0...)

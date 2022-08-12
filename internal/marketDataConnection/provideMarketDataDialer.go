@@ -21,11 +21,13 @@ import (
 	"net/url"
 )
 
+const MarketDataConnection = "MarketDataConnection"
+
 func ProvideMarketDataDialer(
 	maxConnections int,
 	urlAsText string,
 ) fx.Option {
-	const LunoMarketData = "LunoMarketData"
+
 	var opt []fx.Option
 	opt = append(
 		opt,
@@ -46,7 +48,7 @@ func ProvideMarketDataDialer(
 						return messages.CreateAppCallback{}, err
 					}
 					f := goCommsNetDialer.NewSingleNetDialApp(
-						LunoMarketData,
+						MarketDataConnection,
 						common.MaxConnectionsSetting(maxConnections),
 						common.MoreOptions(
 							goCommsDefinitions.ProvideUrl("ConnectionUrl", dialerUrl),

@@ -1,38 +1,67 @@
 package lunoService
 
 import (
+	"context"
 	"github.com/bhbosman/goTrader/internal/lunoApi/client"
+	"github.com/bhbosman/goTrader/internal/lunoApi/components"
 	"github.com/bhbosman/gocommon/messageRouter"
 	"github.com/bhbosman/gocommon/messages"
-	"net/http"
+	"strconv"
 )
 
 type data struct {
-	MessageRouter *messageRouter.MessageRouter
-	roundTripper  http.RoundTripper
-	RequestDoer   client.HttpRequestDoer
+	MessageRouter       *messageRouter.MessageRouter
+	ClientWithResponses client.ClientWithResponsesInterface
+}
+
+func (self *data) ListOrders(ctx context.Context, params ListOrderRequest, cb ListOrderResponseCallback) {
+	response, err := self.ClientWithResponses.ListOrdersV2WithResponse(
+		ctx,
+		&components.ListOrdersV2Params{
+			Pair:          &params.Instrument,
+			Closed:        nil,
+			CreatedBefore: nil,
+			Limit:         nil,
+		},
+	)
+	orders := make([]*OrderInformation, len(*response.JSON200.Orders))
+
+	for i, order := range *response.JSON200.Orders {
+		price, _ := strconv.ParseFloat(*order.LimitPrice, 64)
+		volume, _ := strconv.ParseFloat(*order.LimitVolume, 64)
+		orders[i] = &OrderInformation{
+			ClientReference: *order.ClientOrderID,
+			OrderId:         *order.Ref,
+			Instrument:      *order.Pair,
+			Price:           price,
+			Volume:          volume,
+		}
+
+	}
+	if cb != nil {
+		cb(
+			&ListOrderResponse{
+				MessageId: params.MessageId,
+				Status:    response.StatusCode(),
+				ErrorMessage: func() string {
+					switch {
+					case response.JSONDefault == nil:
+						return ""
+					default:
+						return *response.JSONDefault.Message
+					}
+				}(),
+				Error:  err,
+				Orders: orders,
+			},
+		)
+	}
+}
+
+func (self *data) CancelOrder(ctx context.Context, params CancelOrderRequest, cb CancelOrderRequestResponseCallback) {
 }
 
 func (self *data) Start() {
-	//lunoClient, err := client.NewClientWithResponses(
-	//	"https://api.luno.com",
-	//	func(c *client.Client) error {
-	//		c.Client = self.RequestDoer
-	//		return nil
-	//	},
-	//)
-	//if err != nil {
-	//	return
-	//}
-	//balancesWithResponse, err := lunoClient.GetBalancesWithResponse(
-	//	context.Background(),
-	//	&components.GetBalancesParams{
-	//		Assets: nil,
-	//	})
-	//if err != nil {
-	//	return
-	//}
-	//_ = balancesWithResponse.JSON200.Balance
 }
 
 func (self *data) MultiSend(messages ...interface{}) {
@@ -52,12 +81,11 @@ func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) {
 }
 
 func newData(
-	roundTripper http.RoundTripper,
-	RequestDoer client.HttpRequestDoer) (ILunoServiceData, error) {
+	ClientWithResponses client.ClientWithResponsesInterface,
+) (ILunoServiceData, error) {
 	result := &data{
-		roundTripper:  roundTripper,
-		MessageRouter: messageRouter.NewMessageRouter(),
-		RequestDoer:   RequestDoer,
+		MessageRouter:       messageRouter.NewMessageRouter(),
+		ClientWithResponses: ClientWithResponses,
 	}
 	result.MessageRouter.Add(result.handleEmptyQueue)
 	//

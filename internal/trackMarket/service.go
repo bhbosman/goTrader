@@ -1,12 +1,11 @@
 package trackMarket
 
 import (
-	"github.com/bhbosman/goCommonMarketData/fullMarketDataHelper"
-	"github.com/bhbosman/goCommonMarketData/fullMarketDataManagerService"
 	"github.com/bhbosman/goCommsDefinitions"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/IFxService"
+	"github.com/bhbosman/gocommon/messages"
 	"github.com/bhbosman/gocommon/pubSub"
 	"github.com/bhbosman/gocommon/services/ISendMessage"
 	"github.com/cskr/pubsub"
@@ -15,18 +14,18 @@ import (
 )
 
 type service struct {
-	ctx                  context.Context
-	cancelFunc           context.CancelFunc
-	cmdChannel           chan interface{}
-	onData               OnITrackMarketDataCreate
-	Logger               *zap.Logger
-	state                IFxService.State
-	pubSub               *pubsub.PubSub
-	goFunctionCounter    GoFunctionCounter.IService
-	subscribeChannel     *pubsub.NextFuncSubscription
-	FullMarketDataHelper fullMarketDataHelper.IFullMarketDataHelper
-	FmdService           fullMarketDataManagerService.IFmdManagerService
-	modelSettings        modelSettings
+	ctx               context.Context
+	cancelFunc        context.CancelFunc
+	cmdChannel        chan interface{}
+	onData            OnITrackMarketDataCreate
+	Logger            *zap.Logger
+	state             IFxService.State
+	pubSub            *pubsub.PubSub
+	goFunctionCounter GoFunctionCounter.IService
+	subscribeChannel  *pubsub.NextFuncSubscription
+	//FullMarketDataHelper fullMarketDataHelper.IFullMarketDataHelper
+	//FmdService           fullMarketDataManagerService.IFmdManagerService
+	modelSettings IPricingVolumeCalculation
 }
 
 func (self *service) MultiSend(messages ...interface{}) {
@@ -54,7 +53,6 @@ func (self *service) OnStart(ctx context.Context) error {
 }
 
 func (self *service) OnStop(ctx context.Context) error {
-	self.FmdService.UnsubscribeFullMarketData(self.modelSettings.instrument)
 	err := self.shutdown(ctx)
 	close(self.cmdChannel)
 	self.state = IFxService.Stopped
@@ -82,11 +80,7 @@ func (self *service) start(_ context.Context) error {
 
 func (self *service) goStart(instanceData ITrackMarketData) {
 	self.subscribeChannel = pubsub.NewNextFuncSubscription(goCommsDefinitions.CreateNextFunc(self.cmdChannel))
-	self.pubSub.AddSub(
-		self.subscribeChannel,
-		self.FullMarketDataHelper.InstrumentChannelNameForTop5(self.modelSettings.instrument))
-	self.FmdService.SubscribeFullMarketData(self.modelSettings.instrument)
-
+	instanceData.SetSubscriptionReceiver(self.subscribeChannel)
 	channelHandlerCallback := ChannelHandler.CreateChannelHandlerCallback(
 		self.ctx,
 		instanceData,
@@ -115,6 +109,7 @@ func (self *service) goStart(instanceData ITrackMarketData) {
 		},
 		goCommsDefinitions.CreateTryNextFunc(self.cmdChannel),
 	)
+	_ = instanceData.Send(&messages.EmptyQueue{})
 loop:
 	for {
 		select {
@@ -152,21 +147,17 @@ func newService(
 	logger *zap.Logger,
 	pubSub *pubsub.PubSub,
 	goFunctionCounter GoFunctionCounter.IService,
-	FullMarketDataHelper fullMarketDataHelper.IFullMarketDataHelper,
-	FmdService fullMarketDataManagerService.IFmdManagerService,
-	modelSettings modelSettings,
+	modelSettings IPricingVolumeCalculation,
 ) (ITrackMarketService, error) {
 	localCtx, localCancelFunc := context.WithCancel(parentContext)
 	return &service{
-		ctx:                  localCtx,
-		cancelFunc:           localCancelFunc,
-		cmdChannel:           make(chan interface{}, 32),
-		onData:               onData,
-		Logger:               logger,
-		pubSub:               pubSub,
-		goFunctionCounter:    goFunctionCounter,
-		FullMarketDataHelper: FullMarketDataHelper,
-		FmdService:           FmdService,
-		modelSettings:        modelSettings,
+		ctx:               localCtx,
+		cancelFunc:        localCancelFunc,
+		cmdChannel:        make(chan interface{}, 32),
+		onData:            onData,
+		Logger:            logger,
+		pubSub:            pubSub,
+		goFunctionCounter: goFunctionCounter,
+		modelSettings:     modelSettings,
 	}, nil
 }

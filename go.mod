@@ -10,11 +10,15 @@ require (
 	github.com/bhbosman/goFxApp v0.0.0-20220715185456-22d132c8b983
 	github.com/bhbosman/goFxAppManager v0.0.0-20220730103022-02c299931769
 	github.com/bhbosman/goMessages v0.0.0-20220719163819-d38fc7e6d38c
+	github.com/bhbosman/goUi v0.0.0-20220802121659-b90381157031
 	github.com/bhbosman/gocommon v0.0.0-20220802132121-5e81013de07d
 	github.com/bhbosman/gocomms v0.0.0-20220628074707-e93417aaaed2
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.11.0
+	github.com/gdamore/tcell/v2 v2.5.1
+	github.com/openlyinc/pointy v1.1.2
 	github.com/reactivex/rxgo/v2 v2.5.0
+	github.com/rivo/tview v0.0.0-20220709181631-73bf2902b59a
 	go.uber.org/fx v1.17.1
 	go.uber.org/multierr v1.6.0
 	go.uber.org/zap v1.21.0
@@ -23,7 +27,6 @@ require (
 
 require (
 	github.com/bhbosman/goConnectionManager v0.0.0-20220802122816-d9db41f332dc // indirect
-	github.com/bhbosman/goUi v0.0.0-20220802121659-b90381157031 // indirect
 	github.com/bhbosman/goerrors v0.0.0-20220623084908-4d7bbcd178cf // indirect
 	github.com/bhbosman/gomessageblock v0.0.0-20220617132215-32f430d7de62 // indirect
 	github.com/bhbosman/goprotoextra v0.0.2-0.20210817141206-117becbef7c7 // indirect
@@ -31,14 +34,12 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
-	github.com/gdamore/tcell/v2 v2.5.1 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/icza/gox v0.0.0-20220321141217-e2d488ab2fbc // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rivo/tview v0.0.0-20220709181631-73bf2902b59a // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/stretchr/objx v0.2.0 // indirect

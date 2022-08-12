@@ -2,6 +2,7 @@ package trackMarketView
 
 import (
 	"github.com/bhbosman/goCommsDefinitions"
+	"github.com/bhbosman/goTrader/internal/publish"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/IFxService"
@@ -13,17 +14,35 @@ import (
 )
 
 type service struct {
-	parentContext     context.Context
-	ctx               context.Context
-	cancelFunc        context.CancelFunc
-	cmdChannel        chan interface{}
-	onData            func() (ITrackMarketViewData, error)
-	Logger            *zap.Logger
-	state             IFxService.State
-	pubSub            *pubsub.PubSub
-	goFunctionCounter GoFunctionCounter.IService
-	subscribeChannel  *pubsub.NextFuncSubscription
-	onListChange      func(data []string) bool
+	ctx                  context.Context
+	cancelFunc           context.CancelFunc
+	cmdChannel           chan interface{}
+	onData               func() (ITrackMarketViewData, error)
+	Logger               *zap.Logger
+	state                IFxService.State
+	pubSub               *pubsub.PubSub
+	goFunctionCounter    GoFunctionCounter.IService
+	subscribeChannel     *pubsub.NextFuncSubscription
+	onListChange         func(data []string) bool
+	onStrategyDataChange func(name string, data publish.IStrategy) bool
+}
+
+func (self *service) Unsubscribe(item string) {
+	_, err := CallITrackMarketViewUnsubscribe(self.ctx, self.cmdChannel, false, item)
+	if err != nil {
+		return
+	}
+}
+
+func (self *service) Subscribe(item string) {
+	_, err := CallITrackMarketViewSubscribe(self.ctx, self.cmdChannel, false, item)
+	if err != nil {
+		return
+	}
+}
+
+func (self *service) SetStrategyDataChange(onStrategyDataChange func(name string, data publish.IStrategy) bool) {
+	self.onStrategyDataChange = onStrategyDataChange
 }
 
 func (self *service) SetListChange(onListChange func(data []string) bool) {
@@ -82,6 +101,7 @@ func (self *service) start(_ context.Context) error {
 
 func (self *service) goStart(instanceData ITrackMarketViewData) {
 	instanceData.SetListChange(self.onListChange)
+	instanceData.SetStrategyDataChange(self.onStrategyDataChange)
 
 	self.subscribeChannel = pubsub.NewNextFuncSubscription(goCommsDefinitions.CreateNextFunc(self.cmdChannel))
 
@@ -140,7 +160,7 @@ func (self *service) State() IFxService.State {
 	return self.state
 }
 
-func (self service) ServiceName() string {
+func (self *service) ServiceName() string {
 	return "TrackMarketView"
 }
 
@@ -153,7 +173,6 @@ func newService(
 ) (ITrackMarketViewService, error) {
 	localCtx, localCancelFunc := context.WithCancel(parentContext)
 	return &service{
-		parentContext:     parentContext,
 		ctx:               localCtx,
 		cancelFunc:        localCancelFunc,
 		cmdChannel:        make(chan interface{}, 32),

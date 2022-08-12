@@ -1,9 +1,11 @@
 package trackMarket
 
 import (
+	"github.com/bhbosman/goMessages/marketData/stream"
 	"github.com/bhbosman/gocommon/Services/IDataShutDown"
 	"github.com/bhbosman/gocommon/Services/IFxService"
 	"github.com/bhbosman/gocommon/services/ISendMessage"
+	"github.com/cskr/pubsub"
 )
 
 type ITrackMarket interface {
@@ -19,4 +21,19 @@ type ITrackMarketService interface {
 type ITrackMarketData interface {
 	ITrackMarket
 	IDataShutDown.IDataShutDown
+	SetSubscriptionReceiver(channel *pubsub.NextFuncSubscription)
+}
+
+type PriceVolumeResponse struct {
+	TradingInterface string
+	OrderId          int
+	Side             string
+	Price            float64
+	Volume           float64
+}
+
+type IPricingVolumeCalculation interface {
+	Instruments() []string
+	Calculate(activeDataMap map[string]*stream.PublishTop5) ([]*PriceVolumeResponse, error)
+	StrategyName() string
 }
