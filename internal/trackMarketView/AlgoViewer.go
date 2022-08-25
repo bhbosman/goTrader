@@ -2,15 +2,21 @@ package trackMarketView
 
 import (
 	"fmt"
+	"github.com/bhbosman/goTrader/internal/publish"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
 type AlgoViewer struct {
-	flex        *tview.Flex
-	tableList   *tview.Table
-	tableList02 *tview.Table
-	label       *tview.TextView
+	flex            *tview.Flex
+	marketDataTable *tview.Table
+	tableList02     *tview.Table
+	label           *tview.TextView
+	marketDataPlate *marketDataPlate
+}
+
+func (self *AlgoViewer) Close() error {
+	return nil
 }
 
 func (self *AlgoViewer) Draw(screen tcell.Screen) {
@@ -46,15 +52,18 @@ func (self *AlgoViewer) MouseHandler() func(action tview.MouseAction, event *tce
 }
 
 func (self *AlgoViewer) SetData(data interface{}) {
-
+	if unk, ok := data.(*publish.PublishData); ok {
+		self.marketDataPlate = newMarketDataPlate(unk.MarketData)
+		self.marketDataTable.SetContent(self.marketDataPlate)
+	}
 }
 
 func (self *AlgoViewer) init() {
 
 	self.flex.SetDirection(tview.FlexRow)
-	self.tableList = tview.NewTable()
-	self.tableList.SetTitle("dddd")
-	self.tableList.SetBorder(true)
+	self.marketDataTable = tview.NewTable()
+	self.marketDataTable.SetTitle("MarketData")
+	self.marketDataTable.SetBorder(true)
 	self.tableList02 = tview.NewTable()
 	self.tableList02.SetTitle("dddd")
 	self.tableList02.SetBorder(true)
@@ -62,7 +71,7 @@ func (self *AlgoViewer) init() {
 	self.label = tview.NewTextView()
 	fmt.Fprint(self.label, "ffffff")
 	self.flex.AddItem(self.label, 1, 1, true)
-	self.flex.AddItem(self.tableList, 0, 40, false)
+	self.flex.AddItem(self.marketDataTable, 0, 40, false)
 	self.flex.AddItem(self.tableList02, 0, 40, false)
 }
 

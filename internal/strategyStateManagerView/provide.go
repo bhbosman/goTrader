@@ -1,6 +1,7 @@
-package trackMarketView
+package strategyStateManagerView
 
 import (
+	"github.com/bhbosman/goTrader/internal/strategyStateManagerService"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/interfaces"
 	"github.com/cskr/pubsub"
@@ -41,6 +42,7 @@ func Provide() fx.Option {
 						UniqueReferenceService interfaces.IUniqueReferenceService
 						UniqueSessionNumber    interfaces.IUniqueSessionNumber
 						GoFunctionCounter      GoFunctionCounter.IService
+						StrategyManagerService strategyStateManagerService.IStrategyManagerService
 					},
 				) (ITrackMarketViewService, error) {
 					serviceInstance, err := newService(
@@ -49,6 +51,7 @@ func Provide() fx.Option {
 						params.Logger,
 						params.PubSub,
 						params.GoFunctionCounter,
+						params.StrategyManagerService,
 					)
 					if err != nil {
 						return nil, err

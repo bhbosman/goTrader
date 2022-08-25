@@ -2,7 +2,7 @@
 // Source: github.com/bhbosman/goTrader/internal/trackMarketView (interfaces: ITrackMarketView)
 
 // Package trackMarketView is a generated GoMock package.
-package trackMarketView
+package strategyStateManagerView
 
 import (
 	fmt "fmt"

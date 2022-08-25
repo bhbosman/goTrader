@@ -8,7 +8,7 @@ import (
 	"github.com/bhbosman/goMessages/marketData/stream"
 	"github.com/bhbosman/goTrader/internal/lunoService"
 	"github.com/bhbosman/goTrader/internal/publish"
-	"github.com/bhbosman/goTrader/internal/trackMarketView"
+	"github.com/bhbosman/goTrader/internal/strategyStateManagerService"
 	"github.com/bhbosman/gocommon/messageRouter"
 	"github.com/bhbosman/gocommon/messages"
 	"github.com/cskr/pubsub"
@@ -29,20 +29,20 @@ const (
 )
 
 type data struct {
-	MessageRouter          *messageRouter.MessageRouter
-	activeDataMap          map[string]*stream.PublishTop5
-	modelSettings          IPricingVolumeCalculation
-	TrackMarketViewService trackMarketView.ITrackMarketViewService
-	stateFunc              func() (bool, string, error)
-	state                  string
-	flags                  StateFlags
-	instrumentStatus       []*stream2.InstrumentStatus
-	FmdService             fullMarketDataManagerService.IFmdManagerService
-	FullMarketDataHelper   fullMarketDataHelper.IFullMarketDataHelper
-	subscriptionReceiver   *pubsub.NextFuncSubscription
-	pubSub                 *pubsub.PubSub
-	LunoServiceService     lunoService.ILunoServiceService
-	cancelCtx              context.Context
+	MessageRouter        *messageRouter.MessageRouter
+	activeDataMap        map[string]*stream.PublishTop5
+	modelSettings        IPricingVolumeCalculation
+	StrategyManager      strategyStateManagerService.IStrategyStateManager
+	stateFunc            func() (bool, string, error)
+	state                string
+	flags                StateFlags
+	instrumentStatus     []*stream2.InstrumentStatus
+	FmdService           fullMarketDataManagerService.IFmdManagerService
+	FullMarketDataHelper fullMarketDataHelper.IFullMarketDataHelper
+	subscriptionReceiver *pubsub.NextFuncSubscription
+	pubSub               *pubsub.PubSub
+	LunoServiceService   lunoService.ILunoServiceService
+	cancelCtx            context.Context
 }
 
 func (self *data) SetSubscriptionReceiver(channel *pubsub.NextFuncSubscription) {
@@ -70,7 +70,7 @@ func (self *data) Send(message interface{}) error {
 
 func (self *data) ShutDown() error {
 	self.unregisterMarketData()
-	_ = self.TrackMarketViewService.Send(
+	_ = self.StrategyManager.Send(
 		&publish.DeleteStrategy{
 			StrategyName: self.modelSettings.StrategyName(),
 		},
@@ -106,12 +106,12 @@ func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) {
 			break
 		}
 	}
-	publishData := &publish.PublishData{
-		StrategyName: self.modelSettings.StrategyName(),
-		State:        self.state,
-	}
+	var marketDatas []*publish.MarketData
 
 	if top5, ok := self.activeDataMap[self.modelSettings.Instruments()[0]]; ok {
+		marketData := &publish.MarketData{}
+		marketDatas = append(marketDatas, marketData)
+
 		maxIndex := func(a int, b []*stream.Point) int {
 			if len(b) < a {
 				return len(b)
@@ -119,15 +119,24 @@ func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) {
 			return a
 		}
 		for i := 0; i < maxIndex(5, top5.Ask); i++ {
-			publishData.Lines[i].Ask.Price = top5.Ask[i].Price
-			publishData.Lines[i].Ask.Volume = top5.Ask[i].Volume
+			marketData.Lines[i].Ask = publish.PricePoint{
+				Price:  top5.Ask[i].Price,
+				Volume: top5.Ask[i].Volume,
+			}
 		}
 		for i := 0; i < maxIndex(5, top5.Bid); i++ {
-			publishData.Lines[i].Bid.Price = top5.Bid[i].Price
-			publishData.Lines[i].Bid.Volume = top5.Bid[i].Volume
+			marketData.Lines[i].Bid = publish.PricePoint{
+				Price:  top5.Bid[i].Price,
+				Volume: top5.Bid[i].Volume,
+			}
 		}
 	}
-	_ = self.TrackMarketViewService.Send(publishData)
+	publishData := &publish.PublishData{
+		StrategyName: self.modelSettings.StrategyName(),
+		State:        self.state,
+		MarketData:   marketDatas,
+	}
+	_ = self.StrategyManager.Send(publishData)
 }
 func (self *data) initState() (bool, string, error) {
 	const state = "Init"
@@ -236,7 +245,7 @@ func (self *data) registerMarketData() {
 
 func newData(
 	cancelCtx context.Context,
-	trackMarketViewService trackMarketView.ITrackMarketViewService,
+	StrategyManager strategyStateManagerService.IStrategyStateManager,
 	modelSettings IPricingVolumeCalculation,
 	FmdService fullMarketDataManagerService.IFmdManagerService,
 	FullMarketDataHelper fullMarketDataHelper.IFullMarketDataHelper,
@@ -244,16 +253,16 @@ func newData(
 	LunoServiceService lunoService.ILunoServiceService,
 ) (ITrackMarketData, error) {
 	result := &data{
-		cancelCtx:              cancelCtx,
-		MessageRouter:          messageRouter.NewMessageRouter(),
-		activeDataMap:          make(map[string]*stream.PublishTop5),
-		modelSettings:          modelSettings,
-		TrackMarketViewService: trackMarketViewService,
-		flags:                  0,
-		FmdService:             FmdService,
-		FullMarketDataHelper:   FullMarketDataHelper,
-		pubSub:                 pubSub,
-		LunoServiceService:     LunoServiceService,
+		cancelCtx:            cancelCtx,
+		StrategyManager:      StrategyManager,
+		MessageRouter:        messageRouter.NewMessageRouter(),
+		activeDataMap:        make(map[string]*stream.PublishTop5),
+		modelSettings:        modelSettings,
+		flags:                0,
+		FmdService:           FmdService,
+		FullMarketDataHelper: FullMarketDataHelper,
+		pubSub:               pubSub,
+		LunoServiceService:   LunoServiceService,
 	}
 	result.MessageRouter.Add(result.handleEmptyQueue)
 	result.MessageRouter.Add(result.handlePublishTop5)

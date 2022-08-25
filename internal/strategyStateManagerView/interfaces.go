@@ -1,4 +1,4 @@
-package trackMarketView
+package strategyStateManagerView
 
 import (
 	"github.com/bhbosman/goTrader/internal/publish"
@@ -6,6 +6,7 @@ import (
 	"github.com/bhbosman/gocommon/Services/IFxService"
 	"github.com/bhbosman/gocommon/services/ISendMessage"
 	"github.com/rivo/tview"
+	"io"
 )
 
 type ITrackMarketView interface {
@@ -33,6 +34,7 @@ type ITrackMarketViewData interface {
 }
 
 type IAlgoViewer interface {
+	io.Closer
 	tview.Primitive
 	SetData(data interface{})
 }

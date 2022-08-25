@@ -1,8 +1,9 @@
-package trackMarketView
+package strategyStateManagerView
 
 import (
 	"github.com/bhbosman/goCommsDefinitions"
 	"github.com/bhbosman/goTrader/internal/publish"
+	"github.com/bhbosman/goTrader/internal/strategyStateManagerService"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/IFxService"
@@ -14,31 +15,34 @@ import (
 )
 
 type service struct {
-	ctx                  context.Context
-	cancelFunc           context.CancelFunc
-	cmdChannel           chan interface{}
-	onData               func() (ITrackMarketViewData, error)
-	Logger               *zap.Logger
-	state                IFxService.State
-	pubSub               *pubsub.PubSub
-	goFunctionCounter    GoFunctionCounter.IService
-	subscribeChannel     *pubsub.NextFuncSubscription
-	onListChange         func(data []string) bool
-	onStrategyDataChange func(name string, data publish.IStrategy) bool
+	ctx                    context.Context
+	cancelFunc             context.CancelFunc
+	cmdChannel             chan interface{}
+	onData                 func() (ITrackMarketViewData, error)
+	Logger                 *zap.Logger
+	state                  IFxService.State
+	pubSub                 *pubsub.PubSub
+	goFunctionCounter      GoFunctionCounter.IService
+	subscribeChannel       *pubsub.NextFuncSubscription
+	onListChange           func(data []string) bool
+	onStrategyDataChange   func(name string, data publish.IStrategy) bool
+	StrategyManagerService strategyStateManagerService.IStrategyManagerService
 }
 
 func (self *service) Unsubscribe(item string) {
-	_, err := CallITrackMarketViewUnsubscribe(self.ctx, self.cmdChannel, false, item)
-	if err != nil {
-		return
-	}
+	_, _ = CallITrackMarketViewUnsubscribe(self.ctx, self.cmdChannel, false, item)
+	self.pubSub.Unsub(self.subscribeChannel, strategyStateManagerService.StrategyUpdate(item))
 }
 
 func (self *service) Subscribe(item string) {
-	_, err := CallITrackMarketViewSubscribe(self.ctx, self.cmdChannel, false, item)
-	if err != nil {
-		return
-	}
+	_, _ = CallITrackMarketViewSubscribe(self.ctx, self.cmdChannel, false, item)
+	self.pubSub.AddSub(self.subscribeChannel, strategyStateManagerService.StrategyUpdate(item))
+	_ = self.StrategyManagerService.Send(
+		&publish.RequestStrategyItem{
+			Item:     item,
+			Callback: self.subscribeChannel,
+		},
+	)
 }
 
 func (self *service) SetStrategyDataChange(onStrategyDataChange func(name string, data publish.IStrategy) bool) {
@@ -100,10 +104,17 @@ func (self *service) start(_ context.Context) error {
 }
 
 func (self *service) goStart(instanceData ITrackMarketViewData) {
+
 	instanceData.SetListChange(self.onListChange)
 	instanceData.SetStrategyDataChange(self.onStrategyDataChange)
-
 	self.subscribeChannel = pubsub.NewNextFuncSubscription(goCommsDefinitions.CreateNextFunc(self.cmdChannel))
+
+	self.pubSub.AddSub(self.subscribeChannel, strategyStateManagerService.StrategyListUpdate)
+	_ = self.StrategyManagerService.Send(
+		&publish.RequestStrategyList{
+			Callback: self.subscribeChannel,
+		},
+	)
 
 	channelHandlerCallback := ChannelHandler.CreateChannelHandlerCallback(
 		self.ctx,
@@ -170,15 +181,17 @@ func newService(
 	logger *zap.Logger,
 	pubSub *pubsub.PubSub,
 	goFunctionCounter GoFunctionCounter.IService,
+	StrategyManagerService strategyStateManagerService.IStrategyManagerService,
 ) (ITrackMarketViewService, error) {
 	localCtx, localCancelFunc := context.WithCancel(parentContext)
 	return &service{
-		ctx:               localCtx,
-		cancelFunc:        localCancelFunc,
-		cmdChannel:        make(chan interface{}, 32),
-		onData:            onData,
-		Logger:            logger,
-		pubSub:            pubSub,
-		goFunctionCounter: goFunctionCounter,
+		ctx:                    localCtx,
+		cancelFunc:             localCancelFunc,
+		cmdChannel:             make(chan interface{}, 32),
+		onData:                 onData,
+		Logger:                 logger,
+		pubSub:                 pubSub,
+		goFunctionCounter:      goFunctionCounter,
+		StrategyManagerService: StrategyManagerService,
 	}, nil
 }

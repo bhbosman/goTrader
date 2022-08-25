@@ -1,4 +1,4 @@
-package trackMarketView
+package strategyStateManagerView
 
 import (
 	"github.com/rivo/tview"

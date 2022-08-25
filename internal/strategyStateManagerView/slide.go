@@ -1,7 +1,8 @@
-package trackMarketView
+package strategyStateManagerView
 
 import (
 	"github.com/bhbosman/goTrader/internal/publish"
+	"github.com/bhbosman/goTrader/internal/trackMarketView"
 	ui2 "github.com/bhbosman/goUi/ui"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -9,16 +10,15 @@ import (
 )
 
 type slide struct {
-	next            tview.Primitive
-	canDraw         bool
-	app             *tview.Application
-	table           *tview.Table
-	listTable       *tview.Table
-	service         ITrackMarketViewService
-	MainFlex        *tview.Flex
-	CustomComponent IAlgoViewer
-	listPlate       *listPlate
-	selectedItem    string
+	next                   tview.Primitive
+	canDraw                bool
+	app                    *tview.Application
+	listTable              *tview.Table
+	TrackMarketViewService ITrackMarketViewService
+	MainFlex               *tview.Flex
+	CustomComponent        IAlgoViewer
+	listPlate              *listPlate
+	selectedItem           string
 }
 
 func (self *slide) Toggle(b bool) {
@@ -26,11 +26,11 @@ func (self *slide) Toggle(b bool) {
 	switch b {
 	case true:
 		if self.selectedItem != "" {
-			self.service.Subscribe(self.selectedItem)
+			self.TrackMarketViewService.Subscribe(self.selectedItem)
 		}
 	case false:
 		if self.selectedItem != "" {
-			self.service.Unsubscribe(self.selectedItem)
+			self.TrackMarketViewService.Unsubscribe(self.selectedItem)
 		}
 	}
 	if b {
@@ -79,13 +79,6 @@ func (self *slide) UpdateContent() error {
 }
 
 func (self *slide) init() {
-	self.table = tview.NewTable()
-	self.table.SetSelectable(true, false)
-	self.table.SetBorder(true)
-	self.table.SetFixed(1, 1)
-	self.table.SetTitle("Full Market Data Viewer")
-	self.table.SetContent(&emptyCell{})
-
 	self.listTable = tview.NewTable()
 	self.listTable.SetBorder(true)
 	self.listTable.SetSelectable(true, false)
@@ -94,19 +87,20 @@ func (self *slide) init() {
 		func(row, column int) {
 			row, _ = self.listTable.GetSelection()
 			if self.CustomComponent != nil {
+				_ = self.CustomComponent.Close()
 				self.MainFlex.RemoveItem(self.CustomComponent)
 			}
-			if item, ok := self.listPlate.GetItem(row); ok {
-				self.CustomComponent = NewAlgoViewer()
-				self.MainFlex.AddItem(self.CustomComponent, 0, 3, false)
 
+			if item, ok := self.listPlate.GetItem(row); ok {
+				self.CustomComponent = trackMarketView.NewAlgoViewer()
+				self.MainFlex.AddItem(self.CustomComponent, 0, 3, false)
 				if item != self.selectedItem {
 					if self.selectedItem != "" {
-						self.service.Unsubscribe(self.selectedItem)
+						self.TrackMarketViewService.Unsubscribe(self.selectedItem)
 					}
 					self.selectedItem = item
 					if self.canDraw {
-						self.service.Subscribe(self.selectedItem)
+						self.TrackMarketViewService.Subscribe(self.selectedItem)
 					}
 				}
 			}
@@ -136,8 +130,16 @@ func (self *slide) init() {
 func (self *slide) onStrategyDataChange(name string, strategy publish.IStrategy) bool {
 	return self.app.QueueUpdate(
 		func() {
-			if self.canDraw {
-				self.app.ForceDraw()
+			row, _ := self.listTable.GetSelection()
+			if text, ok := self.listPlate.GetItem(row); ok {
+				if text == strategy.GetStrategyName() {
+					if self.CustomComponent != nil {
+						self.CustomComponent.SetData(strategy)
+					}
+					if self.canDraw {
+						self.app.ForceDraw()
+					}
+				}
 			}
 		},
 	)
@@ -146,28 +148,26 @@ func (self *slide) onStrategyDataChange(name string, strategy publish.IStrategy)
 func (self *slide) onListChange(list []string) bool {
 	return self.app.QueueUpdate(
 		func() {
-			if list != nil {
+			if list != nil && len(list) > 0 {
 				plateNil := self.listPlate == nil
 				self.listPlate = newListPlate(list)
 				self.listTable.SetContent(self.listPlate)
-				if plateNil && self.listTable != nil && len(self.listPlate.data) > 0 {
+				if plateNil && self.listTable != nil {
 					self.listTable.Select(1, 0)
 				} else {
 					row, column := self.listTable.GetSelection()
 					self.listTable.Select(row, column)
 				}
 			} else {
-				//if self.selectedItem != "" {
-				//	self.service.UnsubscribeFullMarketData(self.selectedItem)
-				//}
-				//self.selectedItem = ""
-				//self.marketDataListPlate = nil
-				//self.listTable.SetContent(&emptyCell{})
-				//self.marketDataPlate = nil
-				//self.table.SetContent(&emptyCell{})
-
+				if self.selectedItem != "" {
+					self.TrackMarketViewService.Unsubscribe(self.selectedItem)
+				}
+				self.selectedItem = ""
+				self.listTable.SetContent(&emptyCell{})
+				if self.CustomComponent != nil {
+					self.MainFlex.RemoveItem(self.CustomComponent)
+				}
 			}
-
 			if self.canDraw {
 				self.app.ForceDraw()
 			}
@@ -180,8 +180,8 @@ func newSlide(
 	slideService ITrackMarketViewService,
 ) (*slide, error) {
 	result := &slide{
-		app:     app,
-		service: slideService,
+		app:                    app,
+		TrackMarketViewService: slideService,
 	}
 	result.init()
 	slideService.SetListChange(result.onListChange)

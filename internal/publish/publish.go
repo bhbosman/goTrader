@@ -1,5 +1,7 @@
 package publish
 
+import "github.com/bhbosman/goCommsDefinitions"
+
 type IStrategy interface {
 	GetStrategyName() string
 }
@@ -13,11 +15,14 @@ type PriceLine struct {
 	Ask PricePoint
 }
 
+type MarketData struct {
+	Lines [5]PriceLine
+}
+
 type PublishData struct {
 	StrategyName string
 	State        string
-
-	Lines [5]PriceLine
+	MarketData   []*MarketData
 }
 
 func (self *PublishData) GetStrategyName() string {
@@ -26,4 +31,17 @@ func (self *PublishData) GetStrategyName() string {
 
 type DeleteStrategy struct {
 	StrategyName string
+}
+
+type StrategyList struct {
+	Strategies []string
+}
+
+type RequestStrategyList struct {
+	Callback goCommsDefinitions.IAdder
+}
+
+type RequestStrategyItem struct {
+	Item     string
+	Callback goCommsDefinitions.IAdder
 }

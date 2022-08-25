@@ -6,7 +6,8 @@ import (
 	"github.com/bhbosman/goCommonMarketData/fullMarketDataManagerService"
 	fxAppManager "github.com/bhbosman/goFxAppManager/service"
 	"github.com/bhbosman/goTrader/internal/lunoService"
-	"github.com/bhbosman/goTrader/internal/trackMarketView"
+	"github.com/bhbosman/goTrader/internal/strategyStateManagerService"
+	"github.com/bhbosman/goTrader/internal/strategyStateManagerView"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
 	"github.com/bhbosman/gocommon/Services/interfaces"
 	"github.com/bhbosman/gocommon/messages"
@@ -26,17 +27,18 @@ func Provide() fx.Option {
 				params struct {
 					fx.In
 					ApplicationContext     context.Context `name:"Application"`
-					TrackMarketViewService trackMarketView.ITrackMarketViewService
+					TrackMarketViewService strategyStateManagerView.ITrackMarketViewService
 					FullMarketDataHelper   fullMarketDataHelper.IFullMarketDataHelper
 					FmdService             fullMarketDataManagerService.IFmdManagerService
 					PubSub                 *pubsub.PubSub `name:"Application"`
 					LunoServiceService     lunoService.ILunoServiceService
+					StrategyManagerService strategyStateManagerService.IStrategyManagerService
 				},
 			) (OnITrackMarketDataCreate, error) {
 				return func(modelSettings IPricingVolumeCalculation) (ITrackMarketData, error) {
 					return newData(
 						params.ApplicationContext,
-						params.TrackMarketViewService,
+						params.StrategyManagerService,
 						modelSettings,
 						params.FmdService,
 						params.FullMarketDataHelper,
@@ -91,10 +93,28 @@ func Provide() fx.Option {
 				Strategies := Strategies{
 					PegToPrice: []*PegToPrice{
 						{
-							strategyName:     "Peg Luno.XBTZAR BID @ 200,000",
+							strategyName:     "Peg Luno.XBTZAR BID @ 250,000",
 							instrument:       "Luno.XBTZAR",
 							Side:             "BID",
-							PegPrice:         200000,
+							PegPrice:         250000,
+							Volume:           nil,
+							Consideration:    pointy.Float64(1000),
+							TradingInterface: "",
+						},
+						{
+							strategyName:     "Peg Luno.XBTZAR BID @ 300,000",
+							instrument:       "Luno.XBTZAR",
+							Side:             "BID",
+							PegPrice:         300000,
+							Volume:           nil,
+							Consideration:    pointy.Float64(1000),
+							TradingInterface: "",
+						},
+						{
+							strategyName:     "Peg Luno.XBTZAR BID @ 350,000",
+							instrument:       "Luno.XBTZAR",
+							Side:             "BID",
+							PegPrice:         350000,
 							Volume:           nil,
 							Consideration:    pointy.Float64(1000),
 							TradingInterface: "",

@@ -7,23 +7,26 @@ import (
 	"github.com/bhbosman/goFxApp"
 	"github.com/bhbosman/goTrader/internal/lunoService"
 	"github.com/bhbosman/goTrader/internal/marketDataConnection"
+	"github.com/bhbosman/goTrader/internal/strategyStateManagerService"
+	"github.com/bhbosman/goTrader/internal/strategyStateManagerView"
 	"github.com/bhbosman/goTrader/internal/trackMarket"
-	"github.com/bhbosman/goTrader/internal/trackMarketView"
 )
 
 func main() {
 	app := goFxApp.NewFxMainApplicationServices(
 		"Trader",
 		false,
+		strategyStateManagerService.Provide(),
 		marketDataConnection.ProvideMarketDataDialer(1, "tcp4://127.0.0.1:4001"),
 		//fullMarketDataManagerViewer.Provide(),
 		lunoService.Provide(),
 		fullMarketDataManagerService.Provide(true),
 		fullMarketDataHelper.Provide(),
 		instrumentReference.Provide(),
+
 		trackMarket.Provide(),
-		trackMarketView.Provide(),
-		trackMarketView.ProvideView(),
+		strategyStateManagerView.Provide(),
+		strategyStateManagerView.ProvideView(),
 		lunoService.ProvideLunoKeys(
 			false,
 			&lunoService.LunoKeys{

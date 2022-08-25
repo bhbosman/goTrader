@@ -24,37 +24,48 @@ func (self *data) ListOrders(ctx context.Context, params ListOrderRequest, cb Li
 			Limit:         nil,
 		},
 	)
-	orders := make([]*OrderInformation, len(*response.JSON200.Orders))
-
-	for i, order := range *response.JSON200.Orders {
-		price, _ := strconv.ParseFloat(*order.LimitPrice, 64)
-		volume, _ := strconv.ParseFloat(*order.LimitVolume, 64)
-		orders[i] = &OrderInformation{
-			ClientReference: *order.ClientOrderID,
-			OrderId:         *order.Ref,
-			Instrument:      *order.Pair,
-			Price:           price,
-			Volume:          volume,
+	if err != nil {
+		if cb != nil {
+			cb(
+				&ListOrderResponse{
+					MessageId: params.MessageId,
+					Error:     err,
+				},
+			)
 		}
+	} else {
+		orders := make([]*OrderInformation, len(*response.JSON200.Orders))
 
-	}
-	if cb != nil {
-		cb(
-			&ListOrderResponse{
-				MessageId: params.MessageId,
-				Status:    response.StatusCode(),
-				ErrorMessage: func() string {
-					switch {
-					case response.JSONDefault == nil:
-						return ""
-					default:
-						return *response.JSONDefault.Message
-					}
-				}(),
-				Error:  err,
-				Orders: orders,
-			},
-		)
+		for i, order := range *response.JSON200.Orders {
+			price, _ := strconv.ParseFloat(*order.LimitPrice, 64)
+			volume, _ := strconv.ParseFloat(*order.LimitVolume, 64)
+			orders[i] = &OrderInformation{
+				ClientReference: *order.ClientOrderID,
+				OrderId:         *order.Ref,
+				Instrument:      *order.Pair,
+				Price:           price,
+				Volume:          volume,
+			}
+
+		}
+		if cb != nil {
+			cb(
+				&ListOrderResponse{
+					MessageId: params.MessageId,
+					Status:    response.StatusCode(),
+					ErrorMessage: func() string {
+						switch {
+						case response.JSONDefault == nil:
+							return ""
+						default:
+							return *response.JSONDefault.Message
+						}
+					}(),
+					Error:  err,
+					Orders: orders,
+				},
+			)
+		}
 	}
 }
 
