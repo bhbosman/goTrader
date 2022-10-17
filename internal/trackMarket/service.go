@@ -23,9 +23,7 @@ type service struct {
 	pubSub            *pubsub.PubSub
 	goFunctionCounter GoFunctionCounter.IService
 	subscribeChannel  *pubsub.NextFuncSubscription
-	//FullMarketDataHelper fullMarketDataHelper.IFullMarketDataHelper
-	//FmdService           fullMarketDataManagerService.IFmdManagerService
-	modelSettings IPricingVolumeCalculation
+	modelSettings     IPricingVolumeCalculation
 }
 
 func (self *service) MultiSend(messages ...interface{}) {

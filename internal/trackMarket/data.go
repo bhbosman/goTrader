@@ -12,6 +12,7 @@ import (
 	"github.com/bhbosman/gocommon/messageRouter"
 	"github.com/bhbosman/gocommon/messages"
 	"github.com/cskr/pubsub"
+	"time"
 )
 
 type StateFlags uint64
@@ -132,9 +133,15 @@ func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) {
 		}
 	}
 	publishData := &publish.PublishData{
+		Date:         time.Now(),
 		StrategyName: self.modelSettings.StrategyName(),
 		State:        self.state,
 		MarketData:   marketDatas,
+		Actions: []string{
+			"Start",
+			"Stop",
+			"Cancel Orders",
+		},
 	}
 	_ = self.StrategyManager.Send(publishData)
 }
@@ -201,6 +208,7 @@ func (self *data) waitForMarketData() (bool, string, error) {
 			self.stateFunc = self.calculateAndWaitingForInstruction
 			return true, state, nil
 		} else {
+			delete(self.activeDataMap, self.modelSettings.Instruments()[0])
 			self.unregisterMarketData()
 		}
 		return false, state, nil

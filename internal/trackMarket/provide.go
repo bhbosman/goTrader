@@ -60,8 +60,6 @@ func Provide() fx.Option {
 						UniqueReferenceService interfaces.IUniqueReferenceService
 						UniqueSessionNumber    interfaces.IUniqueSessionNumber
 						GoFunctionCounter      GoFunctionCounter.IService
-						//FullMarketDataHelper   fullMarketDataHelper.IFullMarketDataHelper
-						//FmdService             fullMarketDataManagerService.IFmdManagerService
 					},
 				) (OnITrackMarketServiceCreate, error) {
 					return func(modelSettings IPricingVolumeCalculation) (ITrackMarketService, error) {

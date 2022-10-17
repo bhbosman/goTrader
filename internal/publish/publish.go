@@ -1,6 +1,9 @@
 package publish
 
-import "github.com/bhbosman/goCommsDefinitions"
+import (
+	"github.com/bhbosman/goCommsDefinitions"
+	"time"
+)
 
 type IStrategy interface {
 	GetStrategyName() string
@@ -20,9 +23,11 @@ type MarketData struct {
 }
 
 type PublishData struct {
+	Date         time.Time
 	StrategyName string
 	State        string
 	MarketData   []*MarketData
+	Actions      []string
 }
 
 func (self *PublishData) GetStrategyName() string {

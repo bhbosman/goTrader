@@ -2,6 +2,7 @@ package strategyStateManagerView
 
 import (
 	"github.com/bhbosman/goTrader/internal/publish"
+	"github.com/bhbosman/goTrader/internal/strategyStateManagerService"
 	"github.com/bhbosman/goTrader/internal/trackMarketView"
 	ui2 "github.com/bhbosman/goUi/ui"
 	"github.com/gdamore/tcell/v2"
@@ -19,6 +20,8 @@ type slide struct {
 	CustomComponent        IAlgoViewer
 	listPlate              *listPlate
 	selectedItem           string
+	list                   *tview.List
+	//StrategyManager        strategyStateManagerService.IStrategyStateManager
 }
 
 func (self *slide) Toggle(b bool) {
@@ -108,13 +111,31 @@ func (self *slide) init() {
 	)
 	self.listTable.SetSelectedFunc(
 		func(row, column int) {
-
+			self.app.SetFocus(self.list)
 		},
 	)
-	//self.CustomComponent = self.table
-	self.MainFlex = tview.NewFlex().
-		SetDirection(tview.FlexColumn)
-	self.MainFlex.AddItem(self.listTable, 30, 1, true)
+	self.MainFlex = tview.NewFlex().SetDirection(tview.FlexColumn)
+	left := tview.NewFlex().SetDirection(tview.FlexRow)
+	left.AddItem(self.listTable, 0, 1, true)
+	self.list = tview.NewList().ShowSecondaryText(false).
+		AddItem("..", "", 0,
+			func() {
+				self.app.SetFocus(self.listTable)
+			}).
+		AddItem("Start", "", 0,
+			func() {
+
+			}).
+		AddItem("Stop", "", 0,
+			func() {
+
+			})
+	self.list.SetBorder(true).SetTitle("Actions")
+	left.AddItem(self.list, 6, 1, false)
+
+	self.MainFlex.AddItem(left, 30, 1, true)
+
+	//self.MainFlex.AddItem(self.listTable, 30, 1, true)
 
 	self.listTable.SetContent(&emptyCell{})
 	flex := tview.NewFlex().
@@ -178,10 +199,12 @@ func (self *slide) onListChange(list []string) bool {
 func newSlide(
 	app *tview.Application,
 	slideService ITrackMarketViewService,
+	// StrategyManager strategyStateManagerService.IStrategyStateManager,
 ) (*slide, error) {
 	result := &slide{
 		app:                    app,
 		TrackMarketViewService: slideService,
+		//StrategyManager:        StrategyManager,
 	}
 	result.init()
 	slideService.SetListChange(result.onListChange)
@@ -192,6 +215,7 @@ func newSlide(
 type factory struct {
 	Service ITrackMarketViewService
 	app     *tview.Application
+	//StrategyManager strategyStateManagerService.IStrategyStateManager
 }
 
 func (self *factory) OrderNumber() int {
@@ -202,6 +226,7 @@ func (self *factory) Content(nextSlide func()) (string, ui2.IPrimitiveCloser, er
 	slide, err := newSlide(
 		self.app,
 		self.Service,
+		//	self.StrategyManager,
 	)
 	if err != nil {
 		return "", nil, err
@@ -216,10 +241,12 @@ func (self *factory) Title() string {
 func NewCoverSlideFactory(
 	Service ITrackMarketViewService,
 	app *tview.Application,
+	// StrategyManager strategyStateManagerService.IStrategyStateManager,
 ) *factory {
 	return &factory{
 		Service: Service,
 		app:     app,
+		//StrategyManager: StrategyManager,
 	}
 }
 
@@ -231,13 +258,15 @@ func ProvideView() fx.Option {
 				Target: func(
 					params struct {
 						fx.In
-						Service ITrackMarketViewService
-						App     *tview.Application
+						Service         ITrackMarketViewService
+						App             *tview.Application
+						StrategyManager strategyStateManagerService.IStrategyStateManager
 					},
 				) (ui2.ISlideFactory, error) {
 					return NewCoverSlideFactory(
 						params.Service,
 						params.App,
+						//params.StrategyManager,
 					), nil
 				},
 			},

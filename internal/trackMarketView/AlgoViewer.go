@@ -5,6 +5,7 @@ import (
 	"github.com/bhbosman/goTrader/internal/publish"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"time"
 )
 
 type AlgoViewer struct {
@@ -55,11 +56,11 @@ func (self *AlgoViewer) SetData(data interface{}) {
 	if unk, ok := data.(*publish.PublishData); ok {
 		self.marketDataPlate = newMarketDataPlate(unk.MarketData)
 		self.marketDataTable.SetContent(self.marketDataPlate)
+		self.setLabel(unk.Date, unk.State)
 	}
 }
 
 func (self *AlgoViewer) init() {
-
 	self.flex.SetDirection(tview.FlexRow)
 	self.marketDataTable = tview.NewTable()
 	self.marketDataTable.SetTitle("MarketData")
@@ -69,10 +70,16 @@ func (self *AlgoViewer) init() {
 	self.tableList02.SetBorder(true)
 
 	self.label = tview.NewTextView()
-	fmt.Fprint(self.label, "ffffff")
-	self.flex.AddItem(self.label, 1, 1, true)
+	self.setLabel(time.Now(), "(Unknown)")
+
+	self.flex.AddItem(self.label, 4, 1, true)
 	self.flex.AddItem(self.marketDataTable, 0, 40, false)
 	self.flex.AddItem(self.tableList02, 0, 40, false)
+}
+
+func (self *AlgoViewer) setLabel(dt time.Time, state string) {
+	self.label.Clear()
+	_, _ = fmt.Fprintf(self.label, "Update Time: %v \nState: %v", dt, state)
 }
 
 func NewAlgoViewer() *AlgoViewer {
