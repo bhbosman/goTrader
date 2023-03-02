@@ -4,14 +4,14 @@ go 1.18
 
 require (
 	github.com/bhbosman/goCommonMarketData v0.0.0-20220802122727-698b9feba01e
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20220801175552-c5aa68065af3
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20230302063431-887458f90947
 	github.com/bhbosman/goCommsNetDialer v0.0.0-20220726130315-bec9f09e45e7
 	github.com/bhbosman/goCommsStacks v0.0.0-20220802130535-c36f51efcb47
 	github.com/bhbosman/goFxApp v0.0.0-20220715185456-22d132c8b983
 	github.com/bhbosman/goFxAppManager v0.0.0-20220730103022-02c299931769
-	github.com/bhbosman/goMessages v0.0.0-20220719163819-d38fc7e6d38c
-	github.com/bhbosman/goUi v0.0.0-20220802121659-b90381157031
-	github.com/bhbosman/gocommon v0.0.0-20220804192905-2e73403531d0
+	github.com/bhbosman/goMessages v0.0.0-20230302063433-258339efe599
+	github.com/bhbosman/goUi v0.0.0-20230302065227-24c3cb06165e
+	github.com/bhbosman/gocommon v0.0.0-20230302065226-cf91cedfab33
 	github.com/bhbosman/gocomms v0.0.0-20220628074707-e93417aaaed2
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.11.0
