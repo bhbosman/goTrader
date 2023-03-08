@@ -1,0 +1,9 @@
+package:
+    client
+generate:
+#    echo-server: true
+    client: true
+#    models: true
+#    embedded-spec: true
+output:
+    ./client/client.gen.go
