@@ -2,7 +2,6 @@ package strategyStateManagerView
 
 import (
 	"github.com/bhbosman/goTrader/internal/publish"
-	"github.com/bhbosman/goTrader/internal/strategyStateManagerService"
 	"github.com/bhbosman/goTrader/internal/trackMarketView"
 	ui2 "github.com/bhbosman/goUi/ui"
 	"github.com/gdamore/tcell/v2"
@@ -258,9 +257,9 @@ func ProvideView() fx.Option {
 				Target: func(
 					params struct {
 						fx.In
-						Service         ITrackMarketViewService
-						App             *tview.Application
-						StrategyManager strategyStateManagerService.IStrategyStateManager
+						Service ITrackMarketViewService
+						App     *tview.Application
+						//					StrategyManager strategyStateManagerService.IStrategyStateManager
 					},
 				) (ui2.ISlideFactory, error) {
 					return NewCoverSlideFactory(
