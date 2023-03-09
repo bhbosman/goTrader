@@ -4,15 +4,15 @@ go 1.18
 
 require (
 	github.com/bhbosman/goCommonMarketData v0.0.0-20220802122727-698b9feba01e
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20230302063431-887458f90947
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20230308211643-24fe88b2378e
 	github.com/bhbosman/goCommsNetDialer v0.0.0-20220726130315-bec9f09e45e7
 	github.com/bhbosman/goCommsStacks v0.0.0-20220802130535-c36f51efcb47
 	github.com/bhbosman/goFxApp v0.0.0-20220715185456-22d132c8b983
 	github.com/bhbosman/goFxAppManager v0.0.0-20220730103022-02c299931769
 	github.com/bhbosman/goMessages v0.0.0-20230302063433-258339efe599
 	github.com/bhbosman/goUi v0.0.0-20230302065227-24c3cb06165e
-	github.com/bhbosman/gocommon v0.0.0-20230302065226-cf91cedfab33
-	github.com/bhbosman/gocomms v0.0.0-20220628074707-e93417aaaed2
+	github.com/bhbosman/gocommon v0.0.0-20230308114127-b5a97171c205
+	github.com/bhbosman/gocomms v0.0.0-20230307212550-0918a992672c
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.11.0
 	github.com/gdamore/tcell/v2 v2.5.1
@@ -26,7 +26,7 @@ require (
 )
 
 require (
-	github.com/bhbosman/goConnectionManager v0.0.0-20220802122816-d9db41f332dc // indirect
+	github.com/bhbosman/goConnectionManager v0.0.0-20230302065222-d613f6fe8f80 // indirect
 	github.com/bhbosman/goerrors v0.0.0-20220623084908-4d7bbcd178cf // indirect
 	github.com/bhbosman/gomessageblock v0.0.0-20220617132215-32f430d7de62 // indirect
 	github.com/bhbosman/goprotoextra v0.0.2-0.20210817141206-117becbef7c7 // indirect

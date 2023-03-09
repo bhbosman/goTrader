@@ -59,13 +59,13 @@ func ProvideMarketDataDialer(
 							PubSub.ProvidePubSubInstance("Application", params.PubSub),
 							ProvideConnectionReactor(),
 							goCommsDefinitions.ProvideTransportFactoryForCompressedTlsName(
-								topStack.ProvideTopStack(),
-								pingPong.ProvidePingPongStacks(),
-								protoBuf.ProvideStack(),
+								topStack.Provide(),
+								pingPong.Provide(),
+								protoBuf.Provide(),
 								messageCompressor.Provide(),
-								messageNumber.ProvideMessageNumberStack(),
+								messageNumber.Provide(),
 								bvisMessageBreaker.Provide(),
-								tlsStack.ProvideTlsConnectionStacks(),
+								tlsStack.Provide(),
 								bottom.Provide(),
 							),
 							fx.Provide(
