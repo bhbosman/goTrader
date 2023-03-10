@@ -259,13 +259,11 @@ func ProvideView() fx.Option {
 						fx.In
 						Service ITrackMarketViewService
 						App     *tview.Application
-						//					StrategyManager strategyStateManagerService.IStrategyStateManager
 					},
 				) (ui2.ISlideFactory, error) {
 					return NewCoverSlideFactory(
 						params.Service,
 						params.App,
-						//params.StrategyManager,
 					), nil
 				},
 			},
