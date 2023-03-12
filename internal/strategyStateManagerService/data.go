@@ -16,7 +16,7 @@ func StrategyUpdate(name string) string {
 }
 
 type data struct {
-	MessageRouter       *messageRouter.MessageRouter
+	MessageRouter       messageRouter.IMessageRouter
 	strategyMap         map[string]publish.IStrategy
 	dirtyStrategies     map[string]bool
 	strategyListIsDirty bool
@@ -117,11 +117,11 @@ func newData(PubSub *pubsub.PubSub) (IStrategyManagerData, error) {
 		dirtyStrategies: make(map[string]bool),
 		PubSub:          PubSub,
 	}
-	result.MessageRouter.Add(result.handleEmptyQueue)
-	result.MessageRouter.Add(result.handlePublishData)
-	result.MessageRouter.Add(result.handleDeleteStrategy)
-	result.MessageRouter.Add(result.handleRequestStrategyList)
-	result.MessageRouter.Add(result.handleRequestStrategyItem)
+	_ = result.MessageRouter.Add(result.handleEmptyQueue)
+	_ = result.MessageRouter.Add(result.handlePublishData)
+	_ = result.MessageRouter.Add(result.handleDeleteStrategy)
+	_ = result.MessageRouter.Add(result.handleRequestStrategyList)
+	_ = result.MessageRouter.Add(result.handleRequestStrategyItem)
 	//
 	return result, nil
 }

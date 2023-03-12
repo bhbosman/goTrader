@@ -20,7 +20,18 @@ type slide struct {
 	listPlate              *listPlate
 	selectedItem           string
 	list                   *tview.List
+	name                   string
+	orderNumber            int
+
 	//StrategyManager        strategyStateManagerService.IStrategyStateManager
+}
+
+func (self *slide) Name() string {
+	return self.name
+}
+
+func (self *slide) OrderNumber() int {
+	return self.orderNumber
 }
 
 func (self *slide) Toggle(b bool) {
@@ -147,7 +158,7 @@ func (self *slide) init() {
 	self.next = flex
 }
 
-func (self *slide) onStrategyDataChange(name string, strategy publish.IStrategy) bool {
+func (self *slide) onStrategyDataChange(_ string, strategy publish.IStrategy) bool {
 	return self.app.QueueUpdate(
 		func() {
 			row, _ := self.listTable.GetSelection()
@@ -198,43 +209,21 @@ func (self *slide) onListChange(list []string) bool {
 func newSlide(
 	app *tview.Application,
 	slideService ITrackMarketViewService,
+	name string,
+	orderNumber int,
+
 	// StrategyManager strategyStateManagerService.IStrategyStateManager,
 ) (*slide, error) {
 	result := &slide{
 		app:                    app,
 		TrackMarketViewService: slideService,
-		//StrategyManager:        StrategyManager,
+		name:                   name,
+		orderNumber:            orderNumber,
 	}
 	result.init()
 	slideService.SetListChange(result.onListChange)
 	slideService.SetStrategyDataChange(result.onStrategyDataChange)
 	return result, nil
-}
-
-type factory struct {
-	Service ITrackMarketViewService
-	app     *tview.Application
-	//StrategyManager strategyStateManagerService.IStrategyStateManager
-}
-
-func (self *factory) OrderNumber() int {
-	return 2
-}
-
-func (self *factory) Title() string {
-	return "(some view name)"
-}
-
-func NewCoverSlideFactory(
-	Service ITrackMarketViewService,
-	app *tview.Application,
-	// StrategyManager strategyStateManagerService.IStrategyStateManager,
-) *factory {
-	return &factory{
-		Service: Service,
-		app:     app,
-		//StrategyManager: StrategyManager,
-	}
 }
 
 func ProvideView() fx.Option {
@@ -253,11 +242,14 @@ func ProvideView() fx.Option {
 					slide, err := newSlide(
 						params.App,
 						params.Service,
+						"ddddd",
+						2,
 						//	self.StrategyManager,
 					)
 					if err != nil {
 						return nil, err
 					}
+					return slide, nil
 				},
 			},
 		),

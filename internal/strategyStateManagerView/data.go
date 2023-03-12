@@ -7,7 +7,7 @@ import (
 )
 
 type data struct {
-	MessageRouter        *messageRouter.MessageRouter
+	MessageRouter        messageRouter.IMessageRouter
 	strategyListIsDirty  bool
 	onListChange         func(data []string) bool
 	onStrategyDataChange func(name string, data publish.IStrategy) bool
@@ -84,9 +84,9 @@ func newData() (ITrackMarketViewData, error) {
 	result := &data{
 		MessageRouter: messageRouter.NewMessageRouter(),
 	}
-	result.MessageRouter.Add(result.handleEmptyQueue)
-	result.MessageRouter.Add(result.handlePublishData)
-	result.MessageRouter.Add(result.handleStrategyList)
+	_ = result.MessageRouter.Add(result.handleEmptyQueue)
+	_ = result.MessageRouter.Add(result.handlePublishData)
+	_ = result.MessageRouter.Add(result.handleStrategyList)
 	//
 	return result, nil
 }

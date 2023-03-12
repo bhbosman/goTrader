@@ -10,7 +10,7 @@ import (
 )
 
 type data struct {
-	MessageRouter       *messageRouter.MessageRouter
+	MessageRouter       messageRouter.IMessageRouter
 	ClientWithResponses client.ClientWithResponsesInterface
 }
 
@@ -69,7 +69,7 @@ func (self *data) ListOrders(ctx context.Context, params ListOrderRequest, cb Li
 	}
 }
 
-func (self *data) CancelOrder(ctx context.Context, params CancelOrderRequest, cb CancelOrderRequestResponseCallback) {
+func (self *data) CancelOrder(context.Context, CancelOrderRequest, CancelOrderRequestResponseCallback) {
 }
 
 func (self *data) Start() {
@@ -88,7 +88,7 @@ func (self *data) ShutDown() error {
 	return nil
 }
 
-func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) {
+func (self *data) handleEmptyQueue(*messages.EmptyQueue) {
 }
 
 func newData(
@@ -98,7 +98,7 @@ func newData(
 		MessageRouter:       messageRouter.NewMessageRouter(),
 		ClientWithResponses: ClientWithResponses,
 	}
-	result.MessageRouter.Add(result.handleEmptyQueue)
+	_ = result.MessageRouter.Add(result.handleEmptyQueue)
 	//
 	return result, nil
 }

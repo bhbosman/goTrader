@@ -12,6 +12,7 @@ import (
 	"github.com/bhbosman/gocommon/messages"
 	"github.com/bhbosman/gocommon/model"
 	"github.com/bhbosman/gocomms/common"
+	"github.com/bhbosman/gocomms/intf"
 	"github.com/cskr/pubsub"
 	"github.com/reactivex/rxgo/v2"
 	"go.uber.org/multierr"
@@ -52,12 +53,10 @@ func (self *reactor) Open() error {
 }
 
 func (self *reactor) Init(
-	onSendToReactor rxgo.NextFunc,
-	onSendToConnection rxgo.NextFunc,
+	params intf.IInitParams,
 ) (rxgo.NextFunc, rxgo.ErrFunc, rxgo.CompletedFunc, error) {
 	_, _, _, err := self.BaseConnectionReactor.Init(
-		onSendToReactor,
-		onSendToConnection,
+		params,
 	)
 	if err != nil {
 		return nil, nil, nil, err
@@ -99,22 +98,22 @@ func (self *reactor) handleFullMarketData_InstrumentList_ResponseWrapper(incomin
 	_ = self.FmdService.Send(incomingMessage)
 }
 
-func (self *reactor) handlePublishRxHandlerCounters(incomingMessage *model.PublishRxHandlerCounters) {
+func (self *reactor) handlePublishRxHandlerCounters(*model.PublishRxHandlerCounters) {
 	// not used. Swallowing message
 }
 
-func (self *reactor) handleEmptyQueue(incomingMessage *messages.EmptyQueue) {
+func (self *reactor) handleEmptyQueue(*messages.EmptyQueue) {
 	// not used. Swallowing message
 }
 
-func (self *reactor) handlePingWrapper(incomingMessage *stream3.PingWrapper) {
+func (self *reactor) handlePingWrapper(*stream3.PingWrapper) {
 	// not used. Swallowing message
 }
 
-func (self *reactor) handlePongWrapper(incomingMessage *stream3.PongWrapper) {
+func (self *reactor) handlePongWrapper(*stream3.PongWrapper) {
 }
 
-func (self *reactor) OnUnknown(i interface{}) {
+func (self *reactor) OnUnknown(interface{}) {
 }
 
 //goland:noinspection GoSnakeCaseUsage
@@ -151,7 +150,7 @@ func NewConnectionReactor(
 	FullMarketDataHelper fullMarketDataHelper.IFullMarketDataHelper,
 	GoFunctionCounter GoFunctionCounter.IService,
 	FmdService fullMarketDataManagerService.IFmdManagerService,
-) *reactor {
+) intf.IConnectionReactor {
 	result := &reactor{
 		BaseConnectionReactor: common.NewBaseConnectionReactor(
 			logger,
