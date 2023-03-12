@@ -221,18 +221,6 @@ func (self *factory) OrderNumber() int {
 	return 2
 }
 
-func (self *factory) Content(nextSlide func()) (string, ui2.IPrimitiveCloser, error) {
-	slide, err := newSlide(
-		self.app,
-		self.Service,
-		//	self.StrategyManager,
-	)
-	if err != nil {
-		return "", nil, err
-	}
-	return self.Title(), slide, nil
-}
-
 func (self *factory) Title() string {
 	return "(some view name)"
 }
@@ -260,11 +248,16 @@ func ProvideView() fx.Option {
 						Service ITrackMarketViewService
 						App     *tview.Application
 					},
-				) (ui2.ISlideFactory, error) {
-					return NewCoverSlideFactory(
-						params.Service,
+				) (ui2.IPrimitiveCloser, error) {
+
+					slide, err := newSlide(
 						params.App,
-					), nil
+						params.Service,
+						//	self.StrategyManager,
+					)
+					if err != nil {
+						return nil, err
+					}
 				},
 			},
 		),

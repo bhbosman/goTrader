@@ -30,7 +30,7 @@ const (
 )
 
 type data struct {
-	MessageRouter        *messageRouter.MessageRouter
+	MessageRouter        messageRouter.IMessageRouter
 	activeDataMap        map[string]*stream.PublishTop5
 	modelSettings        IPricingVolumeCalculation
 	StrategyManager      strategyStateManagerService.IStrategyStateManager
@@ -237,7 +237,7 @@ func (self *data) unregisterMarketData() {
 	if self.flags.Has(marketDataRegisteredState) {
 		key := self.FullMarketDataHelper.InstrumentChannelNameForTop5(self.modelSettings.Instruments()[0])
 		self.pubSub.Unsub(self.subscriptionReceiver, key)
-		self.FmdService.UnsubscribeFullMarketData(self.modelSettings.Instruments()[0])
+		self.FmdService.UnsubscribeFullMarketData("ABC", self.modelSettings.Instruments()[0])
 		self.flags = self.flags.Clear(marketDataRegisteredState)
 	}
 }
@@ -246,7 +246,7 @@ func (self *data) registerMarketData() {
 	if !self.flags.Has(marketDataRegisteredState) {
 		key := self.FullMarketDataHelper.InstrumentChannelNameForTop5(self.modelSettings.Instruments()[0])
 		self.pubSub.AddSub(self.subscriptionReceiver, key)
-		self.FmdService.SubscribeFullMarketData(self.modelSettings.Instruments()[0])
+		self.FmdService.SubscribeFullMarketData("ABC", self.modelSettings.Instruments()[0])
 		self.flags = self.flags.Set(marketDataRegisteredState)
 	}
 }
