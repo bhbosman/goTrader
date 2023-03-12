@@ -20,7 +20,7 @@ import (
 
 type reactor struct {
 	common.BaseConnectionReactor
-	MessageRouter                     *messageRouter.MessageRouter
+	MessageRouter                     messageRouter.IMessageRouter
 	FullMarketDataHelper              fullMarketDataHelper.IFullMarketDataHelper
 	FmdService                        fullMarketDataManagerService.IFmdManagerService
 	externalFullMarketDataInstruments []string
