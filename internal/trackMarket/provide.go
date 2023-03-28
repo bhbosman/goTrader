@@ -4,13 +4,14 @@ import (
 	"context"
 	"github.com/bhbosman/goCommonMarketData/fullMarketDataHelper"
 	"github.com/bhbosman/goCommonMarketData/fullMarketDataManagerService"
+	"github.com/bhbosman/goConn"
 	fxAppManager "github.com/bhbosman/goFxAppManager/service"
 	"github.com/bhbosman/goTrader/internal/lunoService"
 	"github.com/bhbosman/goTrader/internal/strategyStateManagerService"
 	"github.com/bhbosman/goTrader/internal/strategyStateManagerView"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
-	"github.com/bhbosman/gocommon/Services/interfaces"
 	"github.com/bhbosman/gocommon/messages"
+	"github.com/bhbosman/gocommon/services/interfaces"
 	"github.com/cskr/pubsub"
 	"github.com/openlyinc/pointy"
 	"go.uber.org/fx"
@@ -86,6 +87,8 @@ func Provide() fx.Option {
 					Lifecycle                   fx.Lifecycle
 					OnITrackMarketServiceCreate OnITrackMarketServiceCreate
 					FxManagerService            fxAppManager.IFxManagerService
+					Logger                      *zap.Logger
+					ApplicationContext          context.Context `name:"Application"`
 				},
 			) error {
 				Strategies := Strategies{
@@ -131,13 +134,29 @@ func Provide() fx.Option {
 						fx.Hook{
 							OnStart: func(ctx context.Context) error {
 								return params.FxManagerService.Add(localModel.strategyName,
-									func() (messages.IApp, context.CancelFunc, error) {
+									func() (messages.IApp, goConn.ICancellationContext, error) {
 										trackMarketService, err := params.OnITrackMarketServiceCreate(localModel)
 										if err != nil {
 											return nil, nil, err
 										}
 										app := newAppWrapper(trackMarketService)
-										return app, func() {}, nil
+										namedLogger := params.Logger.Named(m.strategyName)
+										ctx, cancelFunc := context.WithCancel(params.ApplicationContext)
+										cancellationContext, err := goConn.NewCancellationContextNoCloser(
+											m.strategyName,
+											cancelFunc,
+											ctx,
+											namedLogger,
+										)
+
+										_ = goConn.RegisterConnectionShutdown(
+											m.strategyName,
+											func() {
+
+											},
+											cancellationContext)
+
+										return app, cancellationContext, nil
 									},
 								)
 							},
