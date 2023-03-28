@@ -10,8 +10,8 @@ require (
 	github.com/bhbosman/goFxApp v0.0.0-20220715185456-22d132c8b983
 	github.com/bhbosman/goFxAppManager v0.0.0-20230320053418-125763bdf8d5
 	github.com/bhbosman/goMessages v0.0.0-20230302063433-258339efe599
-	github.com/bhbosman/goUi v0.0.0-20230312204226-c4c7ec5f0899
-	github.com/bhbosman/gocommon v0.0.0-20230320083256-4088c43f62a7
+	github.com/bhbosman/goUi v0.0.0-20230327111003-b80e10f7c669
+	github.com/bhbosman/gocommon v0.0.0-20230328140834-3b6f0ea2faaa
 	github.com/bhbosman/gocomms v0.0.0-20230307212550-0918a992672c
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.11.0
@@ -25,13 +25,13 @@ require (
 	golang.org/x/net v0.0.0-20220513224357-95641704303c
 )
 
-require github.com/bhbosman/goConn v0.0.0-20230320102125-d7416dd8d6dc // indirect
+require github.com/bhbosman/goConn v0.0.0-20230327111455-7a39299fb0aa // indirect
 
 require (
-	github.com/bhbosman/goConnectionManager v0.0.0-20230312204225-183859f3cef5 // indirect
+	github.com/bhbosman/goConnectionManager v0.0.0-20230327104600-4b1464715bb4 // indirect
 	github.com/bhbosman/goerrors v0.0.0-20220623084908-4d7bbcd178cf // indirect
 	github.com/bhbosman/gomessageblock v0.0.0-20230308173223-e8144f25444c // indirect
-	github.com/bhbosman/goprotoextra v0.0.2
+	github.com/bhbosman/goprotoextra v0.0.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
