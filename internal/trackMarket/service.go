@@ -1,6 +1,7 @@
 package trackMarket
 
 import (
+	"context"
 	"github.com/bhbosman/goCommsDefinitions"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
@@ -10,7 +11,6 @@ import (
 	"github.com/bhbosman/gocommon/services/ISendMessage"
 	"github.com/cskr/pubsub"
 	"go.uber.org/zap"
-	"golang.org/x/net/context"
 )
 
 type service struct {

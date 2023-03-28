@@ -3,7 +3,7 @@ package lunoService
 import (
 	"github.com/bhbosman/goTrader/internal/lunoApi/client"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
-	"github.com/bhbosman/gocommon/Services/interfaces"
+	"github.com/bhbosman/gocommon/services/interfaces"
 	"github.com/cskr/pubsub"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
