@@ -11,7 +11,7 @@ require (
 	github.com/bhbosman/goFxAppManager v0.0.0-20220730103022-02c299931769
 	github.com/bhbosman/goMessages v0.0.0-20230302063433-258339efe599
 	github.com/bhbosman/goUi v0.0.0-20230328181044-49e31970d158
-	github.com/bhbosman/gocommon v0.0.0-20230328150634-566a0f916878
+	github.com/bhbosman/gocommon v0.0.0-20230328190055-dffeb142435d
 	github.com/bhbosman/gocomms v0.0.0-20230307212550-0918a992672c
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.11.0
