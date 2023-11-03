@@ -4,15 +4,15 @@ go 1.18
 
 require (
 	github.com/bhbosman/goCommonMarketData v0.0.0-20220802122727-698b9feba01e
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20230308211643-24fe88b2378e
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20230329100608-a6a24c060ad8
 	github.com/bhbosman/goCommsNetDialer v0.0.0-20220726130315-bec9f09e45e7
 	github.com/bhbosman/goCommsStacks v0.0.0-20220802130535-c36f51efcb47
 	github.com/bhbosman/goFxApp v0.0.0-20220715185456-22d132c8b983
-	github.com/bhbosman/goFxAppManager v0.0.0-20220730103022-02c299931769
-	github.com/bhbosman/goMessages v0.0.0-20230302063433-258339efe599
-	github.com/bhbosman/goUi v0.0.0-20230328181044-49e31970d158
+	github.com/bhbosman/goFxAppManager v0.0.0-20230328220050-a5b50e43977e
+	github.com/bhbosman/goMessages v0.0.0-20230329104216-4906969c1e61
+	github.com/bhbosman/goUi v0.0.0-20230328220052-834528d68f6d
 	github.com/bhbosman/gocommon v0.0.0-20230329101749-40db0f52d859
-	github.com/bhbosman/gocomms v0.0.0-20230307212550-0918a992672c
+	github.com/bhbosman/gocomms v0.0.0-20230329110556-946ebc6ff5f4
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.11.0
 	github.com/gdamore/tcell/v2 v2.5.1
@@ -20,16 +20,16 @@ require (
 	github.com/reactivex/rxgo/v2 v2.5.0
 	github.com/rivo/tview v0.0.0-20220709181631-73bf2902b59a
 	go.uber.org/fx v1.19.2
-	go.uber.org/multierr v1.6.0
-	go.uber.org/zap v1.23.0
+	go.uber.org/multierr v1.10.0
+	go.uber.org/zap v1.24.0
 	golang.org/x/net v0.0.0-20220513224357-95641704303c
 )
 
 require (
-	github.com/bhbosman/goConnectionManager v0.0.0-20230302065222-d613f6fe8f80 // indirect
+	github.com/bhbosman/goConnectionManager v0.0.0-20230329104211-b2d06385b410 // indirect
 	github.com/bhbosman/goerrors v0.0.0-20220623084908-4d7bbcd178cf // indirect
-	github.com/bhbosman/gomessageblock v0.0.0-20220617132215-32f430d7de62 // indirect
-	github.com/bhbosman/goprotoextra v0.0.2-0.20210817141206-117becbef7c7 // indirect
+	github.com/bhbosman/gomessageblock v0.0.0-20230308173223-e8144f25444c // indirect
+	github.com/bhbosman/goprotoextra v0.0.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -63,13 +63,9 @@ replace github.com/cskr/pubsub => github.com/bhbosman/pubsub v1.0.3-0.2022080220
 
 replace github.com/rivo/tview => github.com/bhbosman/tview v0.0.0-20230310100135-f8b257a85d36
 
-
-
-
 replace github.com/bhbosman/gocomms => ../gocomms
 
 replace github.com/bhbosman/goFxAppManager => ../goFxAppManager
-
 
 replace github.com/bhbosman/goCommsStacks => ../goCommsStacks
 
@@ -92,4 +88,3 @@ replace github.com/bhbosman/goprotoextra => ../goprotoextra
 replace github.com/bhbosman/goMessages => ../goMessages
 
 replace github.com/bhbosman/goCommonMarketData => ../goCommonMarketData
-
