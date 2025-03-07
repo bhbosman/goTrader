@@ -1,30 +1,31 @@
 module github.com/bhbosman/goTrader
 
-go 1.18
+go 1.23.0
+
+toolchain go1.24.0
 
 require (
 	github.com/bhbosman/goCommonMarketData v0.0.0-20220802122727-698b9feba01e
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20230329100608-a6a24c060ad8
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20250307125227-bfc368fdddf9
 	github.com/bhbosman/goCommsNetDialer v0.0.0-20220726130315-bec9f09e45e7
 	github.com/bhbosman/goCommsStacks v0.0.0-20220802130535-c36f51efcb47
 	github.com/bhbosman/goFxApp v0.0.0-20220715185456-22d132c8b983
 	github.com/bhbosman/goFxAppManager v0.0.0-20230328220050-a5b50e43977e
 	github.com/bhbosman/goMessages v0.0.0-20230329104216-4906969c1e61
-	github.com/bhbosman/goUi v0.0.0-20230329104221-220650220e7d
-	github.com/bhbosman/gocommon v0.0.0-20230329101749-40db0f52d859
+	github.com/bhbosman/goUi v0.0.0-20250307150712-d06325af4877
+	github.com/bhbosman/gocommon v0.0.0-20230507180205-b30f653fb84c
 	github.com/bhbosman/gocomms v0.0.0-20230329110556-946ebc6ff5f4
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.11.0
-	github.com/gdamore/tcell/v2 v2.5.1
+	github.com/gdamore/tcell/v2 v2.8.1
 	github.com/openlyinc/pointy v1.1.2
 	github.com/reactivex/rxgo/v2 v2.5.0
-	github.com/rivo/tview v0.0.0-20230621164836-6cc0565babaf
-	go.uber.org/fx v1.20.0
+	github.com/rivo/tview v0.0.0-20241227133733-17b7edb88c57
+	go.uber.org/fx v1.23.0
 	go.uber.org/multierr v1.11.0
-	go.uber.org/zap v1.24.0
-	golang.org/x/net v0.5.0
+	go.uber.org/zap v1.27.0
+	golang.org/x/net v0.37.0
 )
-
 
 replace github.com/gdamore/tcell/v2 => github.com/bhbosman/tcell/v2 v2.5.2-0.20220624055704-f9a9454fab5b
 
