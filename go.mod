@@ -25,35 +25,6 @@ require (
 	golang.org/x/net v0.5.0
 )
 
-require (
-	github.com/bhbosman/goConnectionManager v0.0.0-20230329104211-b2d06385b410 // indirect
-	github.com/bhbosman/goerrors v0.0.0-20220623084908-4d7bbcd178cf // indirect
-	github.com/bhbosman/gomessageblock v0.0.0-20230308173223-e8144f25444c // indirect
-	github.com/bhbosman/goprotoextra v0.0.2 // indirect
-	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/emirpasic/gods v1.18.1 // indirect
-	github.com/gdamore/encoding v1.0.0 // indirect
-	github.com/golang/mock v1.6.0 // indirect
-	github.com/google/uuid v1.3.0 // indirect
-	github.com/icza/gox v0.0.0-20230330130131-23e1aaac139e // indirect
-	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
-	github.com/mattn/go-runewidth v0.0.13 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/rogpeppe/go-internal v1.8.1 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
-	github.com/teivah/onecontext v1.3.0 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
-	go.uber.org/dig v1.17.0 // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	golang.org/x/term v0.4.0 // indirect
-	golang.org/x/text v0.11.0 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
-)
 
 replace github.com/gdamore/tcell/v2 => github.com/bhbosman/tcell/v2 v2.5.2-0.20220624055704-f9a9454fab5b
 
