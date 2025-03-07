@@ -18,6 +18,7 @@ func ProvideLunoAPIKeyID() fx.Option {
 		fx.Annotated{
 			Name: "LunoAPIKeyID",
 			Target: func(data *LunoKeys) string {
+
 				return data.Key
 			},
 		})
