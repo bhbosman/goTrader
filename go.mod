@@ -3,16 +3,16 @@ module github.com/bhbosman/goTrader
 go 1.24.0
 
 require (
-	github.com/bhbosman/goCommonMarketData v0.0.0-20250308054451-6dade8c5c3f9
+	github.com/bhbosman/goCommonMarketData v0.0.0-20250308133807-dfa6df88bdb4
 	github.com/bhbosman/goCommsDefinitions v0.0.0-20250308074916-3e7c0d32b971
-	github.com/bhbosman/goCommsNetDialer v0.0.0-20250308053613-a763632f1b3d
+	github.com/bhbosman/goCommsNetDialer v0.0.0-20250308133838-fcd6077403df
 	github.com/bhbosman/goCommsStacks v0.0.0-20250308055233-8992b9d0c219
 	github.com/bhbosman/goFxApp v0.0.0-20250308052840-c690d60e479d
 	github.com/bhbosman/goFxAppManager v0.0.0-20250308052839-63033ea503a7
-	github.com/bhbosman/goMessages v0.0.0-20250308063841-56e83c4ed9eb
-	github.com/bhbosman/goUi v0.0.0-20250308071736-0cc76a4d2dbf
-	github.com/bhbosman/gocommon v0.0.0-20250308052839-0ebeb121f996
-	github.com/bhbosman/gocomms v0.0.0-20250308053431-cfd3e830d8a5
+	github.com/bhbosman/goMessages v0.0.0-20250308122654-32a88d6d1169
+	github.com/bhbosman/goUi v0.0.0-20250308124821-836921ea8a1e
+	github.com/bhbosman/gocommon v0.0.0-20250308131803-28622f55deb1
+	github.com/bhbosman/gocomms v0.0.0-20250308122654-329e339db0e0
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.16.3
 	github.com/gdamore/tcell/v2 v2.8.1
@@ -26,9 +26,9 @@ require (
 )
 
 require (
-	github.com/bhbosman/goConnectionManager v0.0.0-20250308054322-587c786bedb0 // indirect
+	github.com/bhbosman/goConnectionManager v0.0.0-20250308122653-53a96fe357f2 // indirect
 	github.com/bhbosman/goerrors v0.0.0-20250307194237-312d070c8e38 // indirect
-	github.com/bhbosman/gomessageblock v0.0.0-20250307141417-ab783e8e2eba // indirect
+	github.com/bhbosman/gomessageblock v0.0.0-20250308073733-0b3daca12e3a // indirect
 	github.com/bhbosman/goprotoextra v0.0.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
