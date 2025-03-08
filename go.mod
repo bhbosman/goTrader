@@ -7,6 +7,7 @@ require (
 	github.com/bhbosman/goCommsDefinitions v0.0.0-20250308074916-3e7c0d32b971
 	github.com/bhbosman/goCommsNetDialer v0.0.0-20250308133838-fcd6077403df
 	github.com/bhbosman/goCommsStacks v0.0.0-20250308140058-bc4682f34818
+	github.com/bhbosman/goConn v0.0.0-20250308073057-2a0933b3cb38
 	github.com/bhbosman/goFxApp v0.0.0-20250308072343-1987095b450b
 	github.com/bhbosman/goFxAppManager v0.0.0-20250308072827-0bc0f03a9d29
 	github.com/bhbosman/goMessages v0.0.0-20250308134004-88a683243000
@@ -48,6 +49,7 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/term v0.30.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
