@@ -6,13 +6,13 @@ require (
 	github.com/bhbosman/goCommonMarketData v0.0.0-20250308133807-dfa6df88bdb4
 	github.com/bhbosman/goCommsDefinitions v0.0.0-20250308074916-3e7c0d32b971
 	github.com/bhbosman/goCommsNetDialer v0.0.0-20250308133838-fcd6077403df
-	github.com/bhbosman/goCommsStacks v0.0.0-20250308055233-8992b9d0c219
-	github.com/bhbosman/goFxApp v0.0.0-20250308052840-c690d60e479d
-	github.com/bhbosman/goFxAppManager v0.0.0-20250308052839-63033ea503a7
-	github.com/bhbosman/goMessages v0.0.0-20250308122654-32a88d6d1169
-	github.com/bhbosman/goUi v0.0.0-20250308124821-836921ea8a1e
+	github.com/bhbosman/goCommsStacks v0.0.0-20250308140058-bc4682f34818
+	github.com/bhbosman/goFxApp v0.0.0-20250308072343-1987095b450b
+	github.com/bhbosman/goFxAppManager v0.0.0-20250308072827-0bc0f03a9d29
+	github.com/bhbosman/goMessages v0.0.0-20250308134004-88a683243000
+	github.com/bhbosman/goUi v0.0.0-20250308132651-2a5e82ef72b0
 	github.com/bhbosman/gocommon v0.0.0-20250308131803-28622f55deb1
-	github.com/bhbosman/gocomms v0.0.0-20250308122654-329e339db0e0
+	github.com/bhbosman/gocomms v0.0.0-20250308133812-cb1afb4044ed
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.16.3
 	github.com/gdamore/tcell/v2 v2.8.1
