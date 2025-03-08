@@ -10,11 +10,11 @@ require (
 	github.com/bhbosman/goCommsNetDialer v0.0.0-20220726130315-bec9f09e45e7
 	github.com/bhbosman/goCommsStacks v0.0.0-20220802130535-c36f51efcb47
 	github.com/bhbosman/goFxApp v0.0.0-20220715185456-22d132c8b983
-	github.com/bhbosman/goFxAppManager v0.0.0-20230328220050-a5b50e43977e
-	github.com/bhbosman/goMessages v0.0.0-20230329104216-4906969c1e61
+	github.com/bhbosman/goFxAppManager v0.0.0-20250307145515-bda0fa4d9959
+	github.com/bhbosman/goMessages v0.0.0-20250307224348-83ddb4c19467
 	github.com/bhbosman/goUi v0.0.0-20250307150712-d06325af4877
-	github.com/bhbosman/gocommon v0.0.0-20230507180205-b30f653fb84c
-	github.com/bhbosman/gocomms v0.0.0-20230329110556-946ebc6ff5f4
+	github.com/bhbosman/gocommon v0.0.0-20250307235859-f370cb0a3bac
+	github.com/bhbosman/gocomms v0.0.0-20230730212408-04ba72ddb372
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.11.0
 	github.com/gdamore/tcell/v2 v2.8.1
