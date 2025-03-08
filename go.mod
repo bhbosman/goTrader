@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/bhbosman/goCommonMarketData v0.0.0-20250308054451-6dade8c5c3f9
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20250308000247-4306925b3dfd
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20250308074916-3e7c0d32b971
 	github.com/bhbosman/goCommsNetDialer v0.0.0-20250308053613-a763632f1b3d
 	github.com/bhbosman/goCommsStacks v0.0.0-20250308055233-8992b9d0c219
 	github.com/bhbosman/goFxApp v0.0.0-20250308052840-c690d60e479d
@@ -55,7 +55,7 @@ replace github.com/gdamore/tcell/v2 => github.com/bhbosman/tcell/v2 v2.5.2-0.202
 
 replace github.com/golang/mock => github.com/bhbosman/gomock v1.6.1-0.20250308071159-4cf72f668c72
 
-replace github.com/cskr/pubsub => github.com/bhbosman/pubsub v1.0.3-0.20220802200819-029949e8a8af
+replace github.com/cskr/pubsub => github.com/bhbosman/pubsub v1.0.3-0.20250308124829-e5731aa33222
 
 replace github.com/rivo/tview => github.com/bhbosman/tview v0.0.0-20250308051327-a656c1bc9cfa
 
