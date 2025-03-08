@@ -8,9 +8,9 @@ require (
 	github.com/bhbosman/goCommsNetDialer v0.0.0-20250308053613-a763632f1b3d
 	github.com/bhbosman/goCommsStacks v0.0.0-20250308055233-8992b9d0c219
 	github.com/bhbosman/goFxApp v0.0.0-20250308052840-c690d60e479d
-	github.com/bhbosman/goFxAppManager v0.0.0-20250307225418-ef314d0a9319
-	github.com/bhbosman/goMessages v0.0.0-20250308052839-b11fc966f96a
-	github.com/bhbosman/goUi v0.0.0-20250308052840-a0e5fd7e5f88
+	github.com/bhbosman/goFxAppManager v0.0.0-20250308052839-63033ea503a7
+	github.com/bhbosman/goMessages v0.0.0-20250308063841-56e83c4ed9eb
+	github.com/bhbosman/goUi v0.0.0-20250308064519-26f29e163722
 	github.com/bhbosman/gocommon v0.0.0-20250308052839-0ebeb121f996
 	github.com/bhbosman/gocomms v0.0.0-20250308053431-cfd3e830d8a5
 	github.com/cskr/pubsub v1.0.2
